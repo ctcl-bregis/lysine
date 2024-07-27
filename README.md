@@ -10,6 +10,10 @@ The name is based on the mechanism of action of the medication, lisdexamfetamine
 
 The name is mostly inspired by my interest in ADHD treatments along with it being one of the most well known examples of lysine being used in a prodrug.
 
-## Misc info
-The color to represent Lysine would be <span style="color:#ff6600">#FF6600</span>.
+## Supplementary
+The color to represent Lysine is #FF6600. 
+
+The file extension for Lysine markup is `.lis`.
+
+
 
