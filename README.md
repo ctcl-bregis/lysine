@@ -3,7 +3,7 @@
 </div>
 
 # Lysine
-Lysine is a preprocessor scripting language for webpages meant to replace Sass and Less in my projects.
+Lysine is a preprocessor scripting language for webpages meant to replace Sass in my projects. Lysine also contains a Markdown file processor inspired by Comrak with extra features.
 
 ## Name
 The name is based on the mechanism of action of the medication, lisdexamfetamine. An analogy would be: Lisdexamfetamine; lysine markup is metabolized by red blood cells; is compiled into dextroamphetamine; CSS.
@@ -13,7 +13,10 @@ The name is mostly inspired by my interest in ADHD treatments along with it bein
 ## Supplementary
 The color to represent Lysine is #FF6600. 
 
-The file extension for Lysine markup is `.lis`.
+## File Extensions
 
+Lysine may make use of multiple different file extensions
 
+- .lisc - Lysine CSS
+- .lism - Lysine Markdown
 
