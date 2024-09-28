@@ -13,15 +13,15 @@ use crate::renderer::macros::MacroCollection;
 use crate::renderer::square_brackets::pull_out_square_bracket;
 use crate::renderer::stack_frame::{FrameContext, FrameType, Val};
 use crate::template::Template;
-use crate::tera::Tera;
+use crate::lysine::Lysine;
 use crate::utils::render_to_string;
 use crate::Context;
 
-/// Special string indicating request to dump context
+// Special string indicating request to dump context
 static MAGICAL_DUMP_VAR: &str = "__tera_context";
 
-/// This will convert a Tera variable to a json pointer if it is possible by replacing
-/// the index with their evaluated stringified value
+// This will convert a Lysine variable to a json pointer if it is possible by replacing
+// the index with their evaluated stringified value
 fn evaluate_sub_variables(key: &str, call_stack: &CallStack) -> Result<String> {
     let sub_vars_to_calc = pull_out_square_bracket(key);
     let mut new_key = key.to_string();
@@ -97,32 +97,32 @@ fn process_path<'a>(path: &str, call_stack: &CallStack<'a>) -> Result<Val<'a>> {
     }
 }
 
-/// Processes the ast and renders the output
+// Processes the ast and renders the output
 pub struct Processor<'a> {
-    /// The template we're trying to render
+    // The template we're trying to render
     template: &'a Template,
-    /// Root template of template to render - contains ast to use for rendering
-    /// Can be the same as `template` if a template has no inheritance
+    // Root template of template to render - contains ast to use for rendering
+    // Can be the same as `template` if a template has no inheritance
     template_root: &'a Template,
-    /// The Tera object with template details
-    tera: &'a Tera,
-    /// The call stack for processing
+    // The Lysine object with template details
+    tera: &'a Lysine,
+    // The call stack for processing
     call_stack: CallStack<'a>,
-    /// The macros organised by template and namespaces
+    // The macros organised by template and namespaces
     macros: MacroCollection<'a>,
-    /// If set, rendering should be escaped
+    // If set, rendering should be escaped
     should_escape: bool,
-    /// Used when super() is used in a block, to know where we are in our stack of
-    /// definitions and for which block
-    /// Vec<(block name, tpl_name, level)>
+    // Used when super() is used in a block, to know where we are in our stack of
+    // definitions and for which block
+    // Vec<(block name, tpl_name, level)>
     blocks: Vec<(&'a str, &'a str, usize)>,
 }
 
 impl<'a> Processor<'a> {
-    /// Create a new `Processor` that will do the rendering
+    // Create a new `Processor` that will do the rendering
     pub fn new(
         template: &'a Template,
-        tera: &'a Tera,
+        tera: &'a Lysine,
         context: &'a Context,
         should_escape: bool,
     ) -> Self {
@@ -259,9 +259,9 @@ impl<'a> Processor<'a> {
         Ok(())
     }
 
-    /// The way inheritance work is that the top parent will be rendered by the renderer so for blocks
-    /// we want to look from the bottom (`level = 0`, the template the user is actually rendering)
-    /// to the top (the base template).
+    // The way inheritance work is that the top parent will be rendered by the renderer so for blocks
+    // we want to look from the bottom (`level = 0`, the template the user is actually rendering)
+    // to the top (the base template).
     fn render_block(
         &mut self,
         block: &'a Block,
@@ -450,7 +450,7 @@ impl<'a> Processor<'a> {
         Ok(res)
     }
 
-    /// Render an expression and never escape its result
+    // Render an expression and never escape its result
     fn safe_eval_expression(&mut self, expr: &'a Expr) -> Result<Val<'a>> {
         let should_escape = self.should_escape;
         self.should_escape = false;
@@ -459,7 +459,7 @@ impl<'a> Processor<'a> {
         res
     }
 
-    /// Evaluate a set tag and add the value to the right context
+    // Evaluate a set tag and add the value to the right context
     fn eval_set(&mut self, set: &'a Set) -> Result<()> {
         let assigned_value = self.safe_eval_expression(&set.value)?;
         self.call_stack.add_assignment(&set.key[..], set.global, assigned_value);
@@ -680,8 +680,8 @@ impl<'a> Processor<'a> {
         Ok(res)
     }
 
-    /// In some cases, we will have filters in lhs/rhs of a math expression
-    /// `eval_as_number` only works on ExprVal rather than Expr
+    // In some cases, we will have filters in lhs/rhs of a math expression
+    // `eval_as_number` only works on ExprVal rather than Expr
     fn eval_expr_as_number(&mut self, expr: &'a Expr) -> Result<Option<Number>> {
         if !expr.filters.is_empty() {
             match *self.eval_expression(expr)? {
@@ -695,7 +695,7 @@ impl<'a> Processor<'a> {
         }
     }
 
-    /// Return the value of an expression as a number
+    // Return the value of an expression as a number
     fn eval_as_number(&mut self, expr: &'a ExprVal) -> Result<Option<Number>> {
         let result = match *expr {
             ExprVal::Ident(ref ident) => {
@@ -900,9 +900,9 @@ impl<'a> Processor<'a> {
         Ok(result)
     }
 
-    /// Only called while rendering a block.
-    /// This will look up the block we are currently rendering and its level and try to render
-    /// the block at level + n, where would be the next template in the hierarchy the block is present
+    // Only called while rendering a block.
+    // This will look up the block we are currently rendering and its level and try to render
+    // the block at level + n, where would be the next template in the hierarchy the block is present
     fn do_super(&mut self, write: &mut impl Write) -> Result<()> {
         let &(block_name, _, level) = self.blocks.last().unwrap();
         let mut next_level = level + 1;
@@ -935,7 +935,7 @@ impl<'a> Processor<'a> {
         Err(Error::msg("Tried to use super() in the top level block"))
     }
 
-    /// Looks up identifier and returns its value
+    // Looks up identifier and returns its value
     fn lookup_ident(&self, key: &str) -> Result<Val<'a>> {
         // Magical variable that just dumps the context
         if key == MAGICAL_DUMP_VAR {
@@ -951,8 +951,8 @@ impl<'a> Processor<'a> {
         process_path(key, &self.call_stack)
     }
 
-    /// Process the given node, appending the string result to the buffer
-    /// if it is possible
+    // Process the given node, appending the string result to the buffer
+    // if it is possible
     fn render_node(&mut self, node: &'a Node, write: &mut impl Write) -> Result<()> {
         match *node {
             // Comments are ignored when rendering
@@ -1019,8 +1019,8 @@ impl<'a> Processor<'a> {
         Ok(())
     }
 
-    /// Helper fn that tries to find the current context: are we in a macro? in a parent template?
-    /// in order to give the best possible error when getting an error when rendering a tpl
+    // Helper fn that tries to find the current context: are we in a macro? in a parent template?
+    // in order to give the best possible error when getting an error when rendering a tpl
     fn get_error_location(&self) -> String {
         let mut error_location = format!("Failed to render '{}'", self.template.name);
 
@@ -1037,7 +1037,7 @@ impl<'a> Processor<'a> {
         // which template are we in?
         if let Some(&(name, _template, ref level)) = self.blocks.last() {
             let block_def =
-                self.template.blocks_definitions.get(&name.to_string()).and_then(|b| b.get(*level));
+                self.template.blocks_definitions.get(name).and_then(|b| b.get(*level));
 
             if let Some((tpl_name, _)) = block_def {
                 if tpl_name != &self.template.name {
@@ -1054,7 +1054,7 @@ impl<'a> Processor<'a> {
         error_location
     }
 
-    /// Entry point for the rendering
+    // Entry point for the rendering
     pub fn render(&mut self, write: &mut impl Write) -> Result<()> {
         for node in &self.template_root.ast {
             self.render_node(node, write)

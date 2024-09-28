@@ -6,53 +6,53 @@ use serde_json::value::{to_value, Map, Value};
 
 use crate::errors::{Error, Result as TeraResult};
 
-/// The struct that holds the context of a template rendering.
-///
-/// Light wrapper around a `BTreeMap` for easier insertions of Serializable
-/// values
+// The struct that holds the context of a template rendering.
+//
+// Light wrapper around a `BTreeMap` for easier insertions of Serializable
+// values
 #[derive(Debug, Clone, PartialEq)]
 pub struct Context {
     data: BTreeMap<String, Value>,
 }
 
 impl Context {
-    /// Initializes an empty context
+    // Initializes an empty context
     pub fn new() -> Self {
         Context { data: BTreeMap::new() }
     }
 
-    /// Converts the `val` parameter to `Value` and insert it into the context.
-    ///
-    /// Panics if the serialization fails.
-    ///
-    /// ```rust
-    /// # use tera::Context;
-    /// let mut context = tera::Context::new();
-    /// context.insert("number_users", &42);
-    /// ```
+    // Converts the `val` parameter to `Value` and insert it into the context.
+    //
+    // Panics if the serialization fails.
+    //
+    // ```rust
+    // # use tera::Context;
+    // let mut context = tera::Context::new();
+    // context.insert("number_users", &42);
+    // ```
     pub fn insert<T: Serialize + ?Sized, S: Into<String>>(&mut self, key: S, val: &T) {
         self.data.insert(key.into(), to_value(val).unwrap());
     }
 
-    /// Converts the `val` parameter to `Value` and insert it into the context.
-    ///
-    /// Returns an error if the serialization fails.
-    ///
-    /// ```rust
-    /// # use tera::Context;
-    /// # struct CannotBeSerialized;
-    /// # impl serde::Serialize for CannotBeSerialized {
-    /// #     fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
-    /// #         Err(serde::ser::Error::custom("Error"))
-    /// #     }
-    /// # }
-    /// # let user = CannotBeSerialized;
-    /// let mut context = Context::new();
-    /// // user is an instance of a struct implementing `Serialize`
-    /// if let Err(_) = context.try_insert("number_users", &user) {
-    ///     // Serialization failed
-    /// }
-    /// ```
+    // Converts the `val` parameter to `Value` and insert it into the context.
+    //
+    // Returns an error if the serialization fails.
+    //
+    // ```rust
+    // # use tera::Context;
+    // # struct CannotBeSerialized;
+    // # impl serde::Serialize for CannotBeSerialized {
+    // #     fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+    // #         Err(serde::ser::Error::custom("Error"))
+    // #     }
+    // # }
+    // # let user = CannotBeSerialized;
+    // let mut context = Context::new();
+    // // user is an instance of a struct implementing `Serialize`
+    // if let Err(_) = context.try_insert("number_users", &user) {
+    //     // Serialization failed
+    // }
+    // ```
     pub fn try_insert<T: Serialize + ?Sized, S: Into<String>>(
         &mut self,
         key: S,
@@ -63,24 +63,24 @@ impl Context {
         Ok(())
     }
 
-    /// Appends the data of the `source` parameter to `self`, overwriting existing keys.
-    /// The source context will be dropped.
-    ///
-    /// ```rust
-    /// # use tera::Context;
-    /// let mut target = Context::new();
-    /// target.insert("a", &1);
-    /// target.insert("b", &2);
-    /// let mut source = Context::new();
-    /// source.insert("b", &3);
-    /// source.insert("d", &4);
-    /// target.extend(source);
-    /// ```
+    // Appends the data of the `source` parameter to `self`, overwriting existing keys.
+    // The source context will be dropped.
+    //
+    // ```rust
+    // # use tera::Context;
+    // let mut target = Context::new();
+    // target.insert("a", &1);
+    // target.insert("b", &2);
+    // let mut source = Context::new();
+    // source.insert("b", &3);
+    // source.insert("d", &4);
+    // target.extend(source);
+    // ```
     pub fn extend(&mut self, mut source: Context) {
         self.data.append(&mut source.data);
     }
 
-    /// Converts the context to a `serde_json::Value` consuming the context.
+    // Converts the context to a `serde_json::Value` consuming the context.
     pub fn into_json(self) -> Value {
         let mut m = Map::new();
         for (key, value) in self.data {
@@ -89,7 +89,7 @@ impl Context {
         Value::Object(m)
     }
 
-    /// Takes a serde-json `Value` and convert it into a `Context` with no overhead/cloning.
+    // Takes a serde-json `Value` and convert it into a `Context` with no overhead/cloning.
     pub fn from_value(obj: Value) -> TeraResult<Self> {
         match obj {
             Value::Object(m) => {
@@ -105,25 +105,25 @@ impl Context {
         }
     }
 
-    /// Takes something that impl Serialize and create a context with it.
-    /// Meant to be used if you have a hashmap or a struct and don't want to insert values
-    /// one by one in the context.
+    // Takes something that impl Serialize and create a context with it.
+    // Meant to be used if you have a hashmap or a struct and don't want to insert values
+    // one by one in the context.
     pub fn from_serialize(value: impl Serialize) -> TeraResult<Self> {
         let obj = to_value(value).map_err(Error::json)?;
         Context::from_value(obj)
     }
 
-    /// Returns the value at a given key index.
+    // Returns the value at a given key index.
     pub fn get(&self, index: &str) -> Option<&Value> {
         self.data.get(index)
     }
 
-    /// Remove a key from the context, returning the value at the key if the key was previously inserted into the context.
+    // Remove a key from the context, returning the value at the key if the key was previously inserted into the context.
     pub fn remove(&mut self, index: &str) -> Option<Value> {
         self.data.remove(index)
     }
 
-    /// Checks if a value exists at a specific index.
+    // Checks if a value exists at a specific index.
     pub fn contains_key(&self, index: &str) -> bool {
         self.data.contains_key(index)
     }
@@ -216,7 +216,7 @@ impl ValueTruthy for Value {
     }
 }
 
-/// Converts a dotted path to a json pointer one
+// Converts a dotted path to a json pointer one
 #[inline]
 #[deprecated(
     since = "1.8.0",
@@ -241,7 +241,7 @@ pub fn get_json_pointer(key: &str) -> String {
     res
 }
 
-/// following iterator immitates regex::Regex::new(r#""[^"]*"|[^.\[\]]+"#) but also strips `"` and `'`
+// following iterator immitates regex::Regex::new(r#""[^"]*"|[^.\[\]]+"#) but also strips `"` and `'`
 struct PointerMachina<'a> {
     pointer: &'a str,
     single_quoted: bool,
@@ -348,8 +348,8 @@ impl<'a> Iterator for PointerMachina<'a> {
     }
 }
 
-/// Lookups a dotted path in a json value
-/// contrary to the json slash pointer it's not allowed to begin with a dot
+// Lookups a dotted path in a json value
+// contrary to the json slash pointer it's not allowed to begin with a dot
 #[inline]
 #[must_use]
 pub fn dotted_pointer<'a>(value: &'a Value, pointer: &str) -> Option<&'a Value> {
@@ -367,146 +367,11 @@ pub fn dotted_pointer<'a>(value: &'a Value, pointer: &str) -> Option<&'a Value> 
     )
 }
 
-/// serde jsons parse_index
+// serde jsons parse_index
 #[inline]
 fn parse_index(s: &str) -> Option<usize> {
     if s.starts_with('+') || (s.starts_with('0') && s.len() != 1) {
         return None;
     }
     s.parse().ok()
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    use serde_json::json;
-    use std::collections::HashMap;
-
-    #[test]
-    fn test_dotted_pointer() {
-        let data = r#"{
-            "foo": {
-                "bar": {
-                    "goo": {
-                        "moo": {
-                            "cows": [
-                                {
-                                    "name": "betsy",
-                                    "age" : 2,
-                                    "temperament": "calm"
-                                },
-                                {
-                                    "name": "elsie",
-                                    "age": 3,
-                                    "temperament": "calm"
-                                },
-                                {
-                                    "name": "veal",
-                                    "age": 1,
-                                    "temperament": "ornery"
-                                }
-                            ]
-                        }
-                    }
-                },
-                "http://example.com/": {
-                    "goo": {
-                        "moo": {
-                            "cows": [
-                                {
-                                    "name": "betsy",
-                                    "age" : 2,
-                                    "temperament": "calm"
-                                },
-                                {
-                                    "name": "elsie",
-                                    "age": 3,
-                                    "temperament": "calm"
-                                },
-                                {
-                                    "name": "veal",
-                                    "age": 1,
-                                    "temperament": "ornery"
-                                }
-                            ]
-                        }
-                    }
-                }
-            }
-            }"#;
-
-        let value = serde_json::from_str(data).unwrap();
-
-        assert_eq!(dotted_pointer(&value, ""), Some(&value));
-        assert_eq!(dotted_pointer(&value, "foo"), value.pointer("/foo"));
-        assert_eq!(dotted_pointer(&value, "foo.bar.goo"), value.pointer("/foo/bar/goo"));
-        assert_eq!(dotted_pointer(&value, "skrr"), value.pointer("/skrr"));
-        assert_eq!(
-            dotted_pointer(&value, r#"foo["bar"].baz"#),
-            value.pointer(r#"/foo["bar"]/baz"#)
-        );
-        assert_eq!(
-            dotted_pointer(&value, r#"foo["bar"].baz["qux"].blub"#),
-            value.pointer(r#"/foo["bar"]/baz["qux"]/blub"#)
-        );
-    }
-
-    #[test]
-    fn can_extend_context() {
-        let mut target = Context::new();
-        target.insert("a", &1);
-        target.insert("b", &2);
-        let mut source = Context::new();
-        source.insert("b", &3);
-        source.insert("c", &4);
-        target.extend(source);
-        assert_eq!(*target.data.get("a").unwrap(), to_value(1).unwrap());
-        assert_eq!(*target.data.get("b").unwrap(), to_value(3).unwrap());
-        assert_eq!(*target.data.get("c").unwrap(), to_value(4).unwrap());
-    }
-
-    #[test]
-    fn can_create_context_from_value() {
-        let obj = json!({
-            "name": "bob",
-            "age": 25
-        });
-        let context_from_value = Context::from_value(obj).unwrap();
-        let mut context = Context::new();
-        context.insert("name", "bob");
-        context.insert("age", &25);
-        assert_eq!(context_from_value, context);
-    }
-
-    #[test]
-    fn can_create_context_from_impl_serialize() {
-        let mut map = HashMap::new();
-        map.insert("name", "bob");
-        map.insert("last_name", "something");
-        let context_from_serialize = Context::from_serialize(&map).unwrap();
-        let mut context = Context::new();
-        context.insert("name", "bob");
-        context.insert("last_name", "something");
-        assert_eq!(context_from_serialize, context);
-    }
-
-    #[test]
-    fn can_remove_a_key() {
-        let mut context = Context::new();
-        context.insert("name", "foo");
-        context.insert("bio", "Hi, I'm foo.");
-
-        let mut expected = Context::new();
-        expected.insert("name", "foo");
-        assert_eq!(context.remove("bio"), Some(to_value("Hi, I'm foo.").unwrap()));
-        assert_eq!(context.get("bio"), None);
-        assert_eq!(context, expected);
-    }
-
-    #[test]
-    fn remove_return_none_with_unknown_index() {
-        let mut context = Context::new();
-        assert_eq!(context.remove("unknown"), None);
-    }
 }

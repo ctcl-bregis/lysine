@@ -5,7 +5,7 @@
 
 WHITESPACE = _{ " " | "\t" | "\r" | "\n" }
 
-/// LITERALS
+// LITERALS
 int   = @{ "-" ? ~ ("0" | '1'..'9' ~ '0'..'9' * ) }
 float = @{
     "-" ? ~
@@ -27,11 +27,11 @@ string = @{
     backquoted_quoted_string
 }
 
-boolean = { "true" | "false" | "True" | "False" }
+boolean = { "true" | "false" }
 
 // -----------------------------------------------
 
-/// OPERATORS
+// OPERATORS
 op_or        = @{ "or" ~ WHITESPACE }
 op_and       = @{ "and" ~ WHITESPACE }
 op_not       = @{ "not" ~ WHITESPACE }
@@ -49,7 +49,7 @@ op_modulo    = { "%" }
 
 // -------------------------------------------------
 
-/// Idents
+// Idents
 
 all_chars = _{'a'..'z' | 'A'..'Z' | "_" | '0'..'9'}
 // Used everywhere where an ident is used, except when accessing
@@ -80,8 +80,8 @@ string_concat = { (fn_call | float | int | string | dotted_square_bracket_ident)
 
 // ----------------------------------------------------
 
-/// EXPRESSIONS
-/// We'll use precedence climbing on those in the parser phase
+// EXPRESSIONS
+// We'll use precedence climbing on those in the parser phase
 
 // boolean first so they are not caught as identifiers
 basic_val  = _{ boolean | test_not | test | macro_call | fn_call | dotted_square_bracket_ident | float | int }
@@ -108,7 +108,7 @@ string_array = !{ "[" ~ (string ~ ",")* ~ string? ~ "]"}
 
 // ----------------------------------------------------
 
-/// FUNCTIONS & FILTERS
+// FUNCTIONS & FILTERS
 
 // A keyword argument: something=10, something="a value", something=1+10 etc
 kwarg   = { ident ~ "=" ~ (logic_expr | array_filter) }
@@ -119,7 +119,7 @@ filter  = { "|" ~ (fn_call | ident) }
 
 // ------------------------------------------------------
 
-/// MACROS
+// MACROS
 
 // A macro argument can have default value, only a literal though
 macro_def_arg   = ${ (ident ~ "=" ~ (boolean | string | float | int)) | ident }
@@ -131,9 +131,9 @@ macro_call      = { ident ~ "::" ~ ident ~ "(" ~ kwargs? ~ ")" }
 
 // -------------------------------------------------------
 
-/// TESTS
+// TESTS
 
-// It's a bit weird that tests are the only thing in Tera not using kwargs
+// It's a bit weird that tests are the only thing in Lysine not using kwargs
 // but at the same time it's one arg most of the time so...
 test_arg  = { logic_expr | array_filter }
 test_args = _{ test_arg ~ ("," ~ test_arg)* }
@@ -143,9 +143,9 @@ test      = { dotted_square_bracket_ident ~ "is" ~ test_call }
 
 // -------------------------------------------------------
 
-/// TERA
+// TERA
 
-// All the blocks that Tera recognises
+// All the blocks that Lysine recognises
 variable_start = { "{{-" | "{{" }
 variable_end   = { "-}}" | "}}" }
 // whitespace control

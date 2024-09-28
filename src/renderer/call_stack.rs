@@ -10,15 +10,15 @@ use crate::renderer::stack_frame::{FrameContext, FrameType, StackFrame, Val};
 use crate::template::Template;
 use crate::Context;
 
-/// Contains the user data and allows no mutation
+// Contains the user data and allows no mutation
 #[derive(Debug)]
 pub struct UserContext<'a> {
-    /// Read-only context
+    // Read-only context
     inner: &'a Context,
 }
 
 impl<'a> UserContext<'a> {
-    /// Create an immutable user context to be used in the call stack
+    // Create an immutable user context to be used in the call stack
     pub fn new(context: &'a Context) -> Self {
         UserContext { inner: context }
     }
@@ -34,17 +34,17 @@ impl<'a> UserContext<'a> {
     }
 }
 
-/// Contains the stack of frames
+// Contains the stack of frames
 #[derive(Debug)]
 pub struct CallStack<'a> {
-    /// The stack of frames
+    // The stack of frames
     stack: Vec<StackFrame<'a>>,
-    /// User supplied context for the render
+    // User supplied context for the render
     context: UserContext<'a>,
 }
 
 impl<'a> CallStack<'a> {
-    /// Create the initial call stack
+    // Create the initial call stack
     pub fn new(context: &'a Context, template: &'a Template) -> CallStack<'a> {
         CallStack {
             stack: vec![StackFrame::new(FrameType::Origin, "ORIGIN", template)],
@@ -71,8 +71,8 @@ impl<'a> CallStack<'a> {
         self.stack.push(StackFrame::new_include(name, tpl));
     }
 
-    /// Returns mutable reference to global `StackFrame`
-    /// i.e gets first stack outside current for loops
+    // Returns mutable reference to global `StackFrame`
+    // i.e gets first stack outside current for loops
     pub fn global_frame_mut(&mut self) -> &mut StackFrame<'a> {
         if self.current_frame().kind == FrameType::ForLoop {
             for stack_frame in self.stack.iter_mut().rev() {
@@ -88,17 +88,17 @@ impl<'a> CallStack<'a> {
         }
     }
 
-    /// Returns mutable reference to current `StackFrame`
+    // Returns mutable reference to current `StackFrame`
     pub fn current_frame_mut(&mut self) -> &mut StackFrame<'a> {
         self.stack.last_mut().expect("No current frame exists")
     }
 
-    /// Returns immutable reference to current `StackFrame`
+    // Returns immutable reference to current `StackFrame`
     pub fn current_frame(&self) -> &StackFrame<'a> {
         self.stack.last().expect("No current frame exists")
     }
 
-    /// Pop the last frame
+    // Pop the last frame
     pub fn pop(&mut self) {
         self.stack.pop().expect("Mistakenly popped Origin frame");
     }
@@ -127,7 +127,7 @@ impl<'a> CallStack<'a> {
         None
     }
 
-    /// Add an assignment value (via {% set ... %} and {% set_global ... %} )
+    // Add an assignment value (via {% set ... %} and {% set_global ... %} )
     pub fn add_assignment(&mut self, key: &'a str, global: bool, value: Val<'a>) {
         if global {
             self.global_frame_mut().insert(key, value);
@@ -136,7 +136,7 @@ impl<'a> CallStack<'a> {
         }
     }
 
-    /// Breaks current for loop
+    // Breaks current for loop
     pub fn break_for_loop(&mut self) -> Result<()> {
         match self.current_frame_mut().for_loop {
             Some(ref mut for_loop) => {
@@ -147,7 +147,7 @@ impl<'a> CallStack<'a> {
         }
     }
 
-    /// Continues current for loop
+    // Continues current for loop
     pub fn increment_for_loop(&mut self) -> Result<()> {
         let frame = self.current_frame_mut();
         frame.clear_context();
@@ -160,7 +160,7 @@ impl<'a> CallStack<'a> {
         }
     }
 
-    /// Continues current for loop
+    // Continues current for loop
     pub fn continue_for_loop(&mut self) -> Result<()> {
         match self.current_frame_mut().for_loop {
             Some(ref mut for_loop) => {
@@ -171,7 +171,7 @@ impl<'a> CallStack<'a> {
         }
     }
 
-    /// True if should break body, applicable to `break` and `continue`
+    // True if should break body, applicable to `break` and `continue`
     pub fn should_break_body(&self) -> bool {
         match self.current_frame().for_loop {
             Some(ref for_loop) => {
@@ -181,7 +181,7 @@ impl<'a> CallStack<'a> {
         }
     }
 
-    /// True if should break loop, applicable to `break` only
+    // True if should break loop, applicable to `break` only
     pub fn should_break_for_loop(&self) -> bool {
         match self.current_frame().for_loop {
             Some(ref for_loop) => for_loop.state == ForLoopState::Break,
@@ -189,7 +189,7 @@ impl<'a> CallStack<'a> {
         }
     }
 
-    /// Grab the current frame template
+    // Grab the current frame template
     pub fn active_template(&self) -> &'a Template {
         self.current_frame().active_template
     }

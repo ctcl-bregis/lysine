@@ -1,26 +1,26 @@
 use crate::errors::{Error, Result};
 use crate::parser::ast::MacroDefinition;
 use crate::template::Template;
-use crate::tera::Tera;
+use crate::lysine::Lysine;
 use std::collections::HashMap;
 
 // Types around Macros get complicated, simplify it a bit by using aliases
 
-/// Maps { macro => macro_definition }
+// Maps { macro => macro_definition }
 pub type MacroDefinitionMap = HashMap<String, MacroDefinition>;
-/// Maps { namespace => ( macro_template, { macro => macro_definition }) }
+// Maps { namespace => ( macro_template, { macro => macro_definition }) }
 pub type MacroNamespaceMap<'a> = HashMap<&'a str, (&'a str, &'a MacroDefinitionMap)>;
-/// Maps { template => { namespace => ( macro_template, { macro => macro_definition }) }
+// Maps { template => { namespace => ( macro_template, { macro => macro_definition }) }
 pub type MacroTemplateMap<'a> = HashMap<&'a str, MacroNamespaceMap<'a>>;
 
-/// Collection of all macro templates by file
+// Collection of all macro templates by file
 #[derive(Clone, Debug, Default)]
 pub struct MacroCollection<'a> {
     macros: MacroTemplateMap<'a>,
 }
 
 impl<'a> MacroCollection<'a> {
-    pub fn from_original_template(tpl: &'a Template, tera: &'a Tera) -> MacroCollection<'a> {
+    pub fn from_original_template(tpl: &'a Template, tera: &'a Lysine) -> MacroCollection<'a> {
         let mut macro_collection = MacroCollection { macros: MacroTemplateMap::new() };
 
         macro_collection
@@ -30,15 +30,15 @@ impl<'a> MacroCollection<'a> {
         macro_collection
     }
 
-    /// Add macros from parsed template to `MacroCollection`
-    ///
-    /// Macro templates can import other macro templates so the macro loading needs to
-    /// happen recursively. We need all of the macros loaded in one go to be in the same
-    /// HashMap for easy popping as well, otherwise there could be stray macro
-    /// definitions remaining
+    // Add macros from parsed template to `MacroCollection`
+    //
+    // Macro templates can import other macro templates so the macro loading needs to
+    // happen recursively. We need all of the macros loaded in one go to be in the same
+    // HashMap for easy popping as well, otherwise there could be stray macro
+    // definitions remaining
     pub fn add_macros_from_template(
         &mut self,
-        tera: &'a Tera,
+        tera: &'a Lysine,
         template: &'a Template,
     ) -> Result<()> {
         let template_name = &template.name[..];

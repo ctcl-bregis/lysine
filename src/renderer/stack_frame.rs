@@ -10,7 +10,7 @@ use crate::template::Template;
 pub type Val<'a> = Cow<'a, Value>;
 pub type FrameContext<'a> = HashMap<&'a str, Val<'a>>;
 
-/// Gets a value within a value by pointer, keeping lifetime
+// Gets a value within a value by pointer, keeping lifetime
 #[inline]
 pub fn value_by_pointer<'a>(pointer: &str, val: &Val<'a>) -> Option<Val<'a>> {
     match *val {
@@ -19,37 +19,37 @@ pub fn value_by_pointer<'a>(pointer: &str, val: &Val<'a>) -> Option<Val<'a>> {
     }
 }
 
-/// Enumerates the types of stack frames
+// Enumerates the types of stack frames
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum FrameType {
-    /// Original frame
+    // Original frame
     Origin,
-    /// New frame for macro call
+    // New frame for macro call
     Macro,
-    /// New frame for for loop
+    // New frame for for loop
     ForLoop,
-    /// Include template
+    // Include template
     Include,
 }
 
-/// Entry in the stack frame
+// Entry in the stack frame
 #[derive(Debug)]
 pub struct StackFrame<'a> {
-    /// Type of stack frame
+    // Type of stack frame
     pub kind: FrameType,
-    /// Frame name for context/debugging
+    // Frame name for context/debugging
     pub name: &'a str,
-    /// Assigned value (via {% set ... %}, {% for ... %}, {% namespace::macro(a=a, b=b) %})
-    ///
-    /// - {% set ... %} adds to current frame_context
-    /// - {% for ... %} builds frame_context before iteration
-    /// - {% namespace::macro(a=a, b=b)} builds frame_context before invocation
+    // Assigned value (via {% set ... %}, {% for ... %}, {% namespace::macro(a=a, b=b) %})
+    //
+    // - {% set ... %} adds to current frame_context
+    // - {% for ... %} builds frame_context before iteration
+    // - {% namespace::macro(a=a, b=b)} builds frame_context before invocation
     context: FrameContext<'a>,
-    /// Active template for frame
+    // Active template for frame
     pub active_template: &'a Template,
-    /// `ForLoop` if frame is for a for loop
+    // `ForLoop` if frame is for a for loop
     pub for_loop: Option<ForLoop<'a>>,
-    /// Macro namespace if MacroFrame
+    // Macro namespace if MacroFrame
     pub macro_namespace: Option<&'a str>,
 }
 
@@ -76,12 +76,7 @@ impl<'a> StackFrame<'a> {
         }
     }
 
-    pub fn new_macro(
-        name: &'a str,
-        tpl: &'a Template,
-        macro_namespace: &'a str,
-        context: FrameContext<'a>,
-    ) -> Self {
+    pub fn new_macro(name: &'a str, tpl: &'a Template, macro_namespace: &'a str, context: FrameContext<'a>) -> Self {
         StackFrame {
             kind: FrameType::Macro,
             name,
@@ -103,13 +98,13 @@ impl<'a> StackFrame<'a> {
         }
     }
 
-    /// Finds a value in the stack frame.
-    /// Looks first in `frame_context`, then compares to for_loop key_name and value_name.
+    // Finds a value in the stack frame.
+    // Looks first in `frame_context`, then compares to for_loop key_name and value_name.
     pub fn find_value(&self, key: &str) -> Option<Val<'a>> {
         self.find_value_in_frame(key).or_else(|| self.find_value_in_for_loop(key))
     }
 
-    /// Finds a value in `frame_context`.
+    // Finds a value in `frame_context`.
     pub fn find_value_in_frame(&self, key: &str) -> Option<Val<'a>> {
         if let Some(dot) = key.find('.') {
             if dot < key.len() + 1 {
@@ -125,7 +120,7 @@ impl<'a> StackFrame<'a> {
 
         None
     }
-    /// Finds a value in the `for_loop` if there is one
+    // Finds a value in the `for_loop` if there is one
     pub fn find_value_in_for_loop(&self, key: &str) -> Option<Val<'a>> {
         if let Some(ref for_loop) = self.for_loop {
             // 1st case: the variable is the key of a KeyValue for loop
@@ -139,7 +134,7 @@ impl<'a> StackFrame<'a> {
                 (key, "")
             };
 
-            // 2nd case: one of Tera loop built-in variable
+            // 2nd case: one of Lysine loop built-in variable
             if real_key == "loop" {
                 match tail {
                     "index" => {
@@ -176,12 +171,12 @@ impl<'a> StackFrame<'a> {
         None
     }
 
-    /// Insert a value in the context
+    // Insert a value in the context
     pub fn insert(&mut self, key: &'a str, value: Val<'a>) {
         self.context.insert(key, value);
     }
 
-    /// Context is cleared on each loop
+    // Context is cleared on each loop
     pub fn clear_context(&mut self) {
         if self.for_loop.is_some() {
             self.context.clear();

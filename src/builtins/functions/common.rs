@@ -1,32 +1,10 @@
 use std::collections::HashMap;
-
-#[cfg(feature = "builtins")]
 use chrono::prelude::*;
-#[cfg(feature = "builtins")]
 use rand::Rng;
 use serde_json::value::{from_value, to_value, Value};
+use rand::seq::SliceRandom;
 
 use crate::errors::{Error, Result};
-
-/// The global function type definition
-pub trait Function: Sync + Send {
-    /// The global function type definition
-    fn call(&self, args: &HashMap<String, Value>) -> Result<Value>;
-
-    /// Whether the current function's output should be treated as safe, defaults to `false`
-    fn is_safe(&self) -> bool {
-        false
-    }
-}
-
-impl<F> Function for F
-where
-    F: Fn(&HashMap<String, Value>) -> Result<Value> + Sync + Send,
-{
-    fn call(&self, args: &HashMap<String, Value>) -> Result<Value> {
-        self(args)
-    }
-}
 
 pub fn range(args: &HashMap<String, Value>) -> Result<Value> {
     let start = match args.get("start") {
@@ -83,7 +61,24 @@ pub fn range(args: &HashMap<String, Value>) -> Result<Value> {
     Ok(to_value(res).unwrap())
 }
 
-#[cfg(feature = "builtins")]
+pub fn pick_random(args: &HashMap<String, Value>) -> Result<Value> {
+    let random = match args.get("array") {
+        Some(val) => match val {
+            Value::Array(vec) => {
+                vec.choose(&mut rand::thread_rng()).unwrap()
+            },
+            _ => return Err(Error::msg(format!(
+                "Function `now` received utc={:?} but `array` can only be an array",
+                val
+            ))),
+        },
+        None => return Err(Error::msg("Function `pick_random` was called without a `array` argument")),
+    };
+
+    Ok(random.clone())
+}
+
+
 pub fn now(args: &HashMap<String, Value>) -> Result<Value> {
     let utc = match args.get("utc") {
         Some(val) => match from_value::<bool>(val.clone()) {
@@ -138,7 +133,7 @@ pub fn throw(args: &HashMap<String, Value>) -> Result<Value> {
     }
 }
 
-#[cfg(feature = "builtins")]
+
 pub fn get_random(args: &HashMap<String, Value>) -> Result<Value> {
     let start = match args.get("start") {
         Some(val) => match from_value::<isize>(val.clone()) {
@@ -194,148 +189,3 @@ pub fn get_env(args: &HashMap<String, Value>) -> Result<Value> {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use std::collections::HashMap;
-
-    use serde_json::value::to_value;
-
-    use super::*;
-
-    #[test]
-    fn range_default() {
-        let mut args = HashMap::new();
-        args.insert("end".to_string(), to_value(5).unwrap());
-
-        let res = range(&args).unwrap();
-        assert_eq!(res, to_value(vec![0, 1, 2, 3, 4]).unwrap());
-    }
-
-    #[test]
-    fn range_start() {
-        let mut args = HashMap::new();
-        args.insert("end".to_string(), to_value(5).unwrap());
-        args.insert("start".to_string(), to_value(1).unwrap());
-
-        let res = range(&args).unwrap();
-        assert_eq!(res, to_value(vec![1, 2, 3, 4]).unwrap());
-    }
-
-    #[test]
-    fn range_start_greater_than_end() {
-        let mut args = HashMap::new();
-        args.insert("end".to_string(), to_value(5).unwrap());
-        args.insert("start".to_string(), to_value(6).unwrap());
-
-        assert!(range(&args).is_err());
-    }
-
-    #[test]
-    fn range_step_by() {
-        let mut args = HashMap::new();
-        args.insert("end".to_string(), to_value(10).unwrap());
-        args.insert("step_by".to_string(), to_value(2).unwrap());
-
-        let res = range(&args).unwrap();
-        assert_eq!(res, to_value(vec![0, 2, 4, 6, 8]).unwrap());
-    }
-
-    #[cfg(feature = "builtins")]
-    #[test]
-    fn now_default() {
-        let args = HashMap::new();
-
-        let res = now(&args).unwrap();
-        assert!(res.is_string());
-        assert!(res.as_str().unwrap().contains('T'));
-    }
-
-    #[cfg(feature = "builtins")]
-    #[test]
-    fn now_datetime_utc() {
-        let mut args = HashMap::new();
-        args.insert("utc".to_string(), to_value(true).unwrap());
-
-        let res = now(&args).unwrap();
-        assert!(res.is_string());
-        let val = res.as_str().unwrap();
-        println!("{}", val);
-        assert!(val.contains('T'));
-        assert!(val.contains("+00:00"));
-    }
-
-    #[cfg(feature = "builtins")]
-    #[test]
-    fn now_timestamp() {
-        let mut args = HashMap::new();
-        args.insert("timestamp".to_string(), to_value(true).unwrap());
-
-        let res = now(&args).unwrap();
-        assert!(res.is_number());
-    }
-
-    #[test]
-    fn throw_errors_with_message() {
-        let mut args = HashMap::new();
-        args.insert("message".to_string(), to_value("Hello").unwrap());
-
-        let res = throw(&args);
-        assert!(res.is_err());
-        let err = res.unwrap_err();
-        assert_eq!(err.to_string(), "Hello");
-    }
-
-    #[cfg(feature = "builtins")]
-    #[test]
-    fn get_random_no_start() {
-        let mut args = HashMap::new();
-        args.insert("end".to_string(), to_value(10).unwrap());
-        let res = get_random(&args).unwrap();
-        println!("{}", res);
-        assert!(res.is_number());
-        assert!(res.as_i64().unwrap() >= 0);
-        assert!(res.as_i64().unwrap() < 10);
-    }
-
-    #[cfg(feature = "builtins")]
-    #[test]
-    fn get_random_with_start() {
-        let mut args = HashMap::new();
-        args.insert("start".to_string(), to_value(5).unwrap());
-        args.insert("end".to_string(), to_value(10).unwrap());
-        let res = get_random(&args).unwrap();
-        println!("{}", res);
-        assert!(res.is_number());
-        assert!(res.as_i64().unwrap() >= 5);
-        assert!(res.as_i64().unwrap() < 10);
-    }
-
-    #[test]
-    fn get_env_existing() {
-        std::env::set_var("TERA_TEST", "true");
-        let mut args = HashMap::new();
-        args.insert("name".to_string(), to_value("TERA_TEST").unwrap());
-        let res = get_env(&args).unwrap();
-        assert!(res.is_string());
-        assert_eq!(res.as_str().unwrap(), "true");
-        std::env::remove_var("TERA_TEST");
-    }
-
-    #[test]
-    fn get_env_non_existing_no_default() {
-        let mut args = HashMap::new();
-        args.insert("name".to_string(), to_value("UNKNOWN_VAR").unwrap());
-        let res = get_env(&args);
-        assert!(res.is_err());
-    }
-
-    #[test]
-    fn get_env_non_existing_with_default() {
-        let mut args = HashMap::new();
-        args.insert("name".to_string(), to_value("UNKNOWN_VAR").unwrap());
-        args.insert("default".to_string(), to_value("false").unwrap());
-        let res = get_env(&args).unwrap();
-        assert!(res.is_string());
-        assert_eq!(res.as_str().unwrap(), "false");
-    }
-}

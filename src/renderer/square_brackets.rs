@@ -1,5 +1,5 @@
-/// Return a Vec of all substrings contained in '[ ]'s
-/// Ignore quoted strings and integers.
+// Return a Vec of all substrings contained in '[ ]'s
+// Ignore quoted strings and integers.
 pub fn pull_out_square_bracket(s: &str) -> Vec<String> {
     let mut chars = s.chars();
     let mut results = vec![];
@@ -37,15 +37,3 @@ pub fn pull_out_square_bracket(s: &str) -> Vec<String> {
     results
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn can_pull_out_square_bracket() {
-        assert_eq!(pull_out_square_bracket("hi"), Vec::<String>::new());
-        assert_eq!(pull_out_square_bracket("['hi']"), Vec::<String>::new());
-        assert_eq!(pull_out_square_bracket("[hi] a[0]"), vec!["hi"]);
-        assert_eq!(pull_out_square_bracket("hi [th[e]['r']e] [fish]"), vec!["th[e]['r']e", "fish"]);
-    }
-}

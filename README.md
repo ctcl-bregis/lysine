@@ -1,6 +1,4 @@
-<div>
-  <img src="lysine_logo.svg" style="width: 25%" alt="Lysine"/>
-</div>
+<img src="lysine_logo.svg" style="width: 25%" alt="Lysine"/>
 
 # Lysine
 Lysine is a preprocessor scripting language for webpages meant to replace SCSS in my projects.
@@ -13,3 +11,18 @@ The name is based on the mechanism of action of the medication, lisdexamfetamine
 ## Branding
 The color to represent Lysine is #FF6600. The secondary color is #0000FF.
 
+## Differences from Tera
+
+Overall code changes:
+- Tests have been removed from the source code for now.
+- Update code conventions deprecated in Rust 2021 edition 
+
+### Functions
+src/builtins/functions.rs was split into the directory src/builtins/functions/ to 
+
+- pick_random: Picks a random value in a vec passed as "array"
+- hex2rgb: converts hex (e.g. #F0D000) to RGB values (e.g. rgb(240, 224, 0))
+
+### Syntax
+
+- "True" and "False" are no longer aliases for "true" and "false".

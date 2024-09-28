@@ -1,27 +1,27 @@
 use std::collections::HashMap;
 use std::fmt;
 
-/// Whether to remove the whitespace of a `{% %}` tag
+// Whether to remove the whitespace of a `{% %}` tag
 #[derive(Clone, Copy, Debug, PartialEq, Default)]
 pub struct WS {
-    /// `true` if the tag is `{%-`
+    // `true` if the tag is `{%-`
     pub left: bool,
-    /// `true` if the tag is `-%}`
+    // `true` if the tag is `-%}`
     pub right: bool,
 }
 
-/// All math operators
+// All math operators
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub enum MathOperator {
-    /// +
+    // +
     Add,
-    /// -
+    // -
     Sub,
-    /// *
+    // *
     Mul,
-    /// /
+    // /
     Div,
-    /// %
+    // %
     Modulo,
 }
 
@@ -41,24 +41,24 @@ impl fmt::Display for MathOperator {
     }
 }
 
-/// All logic operators
+// All logic operators
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub enum LogicOperator {
-    /// >
+    // >
     Gt,
-    /// >=
+    // >=
     Gte,
-    /// <
+    // <
     Lt,
-    /// <=
+    // <=
     Lte,
-    /// ==
+    // ==
     Eq,
-    /// !=
+    // !=
     NotEq,
-    /// and
+    // and
     And,
-    /// or
+    // or
     Or,
 }
 
@@ -81,41 +81,41 @@ impl fmt::Display for LogicOperator {
     }
 }
 
-/// A function call, can be a filter or a global function
+// A function call, can be a filter or a global function
 #[derive(Clone, Debug, PartialEq)]
 pub struct FunctionCall {
-    /// The name of the function
+    // The name of the function
     pub name: String,
-    /// The args of the function: key -> value
+    // The args of the function: key -> value
     pub args: HashMap<String, Expr>,
 }
 
-/// A mathematical expression
+// A mathematical expression
 #[derive(Clone, Debug, PartialEq)]
 pub struct MathExpr {
-    /// The left hand side of the expression
+    // The left hand side of the expression
     pub lhs: Box<Expr>,
-    /// The right hand side of the expression
+    // The right hand side of the expression
     pub rhs: Box<Expr>,
-    /// The operator used
+    // The operator used
     pub operator: MathOperator,
 }
 
-/// A logical expression
+// A logical expression
 #[derive(Clone, Debug, PartialEq)]
 pub struct LogicExpr {
-    /// The left hand side of the expression
+    // The left hand side of the expression
     pub lhs: Box<Expr>,
-    /// The right hand side of the expression
+    // The right hand side of the expression
     pub rhs: Box<Expr>,
-    /// The operator used
+    // The operator used
     pub operator: LogicOperator,
 }
 
-/// Can only be a combination of string + ident or ident + ident
+// Can only be a combination of string + ident or ident + ident
 #[derive(Clone, Debug, PartialEq)]
 pub struct StringConcat {
-    /// All the values we're concatening into a string
+    // All the values we're concatening into a string
     pub values: Vec<ExprVal>,
 }
 
@@ -134,18 +134,18 @@ impl StringConcat {
     }
 }
 
-/// Something that checks whether the left side is contained in the right side
+// Something that checks whether the left side is contained in the right side
 #[derive(Clone, Debug, PartialEq)]
 pub struct In {
-    /// The needle, a string or a basic expression/literal
+    // The needle, a string or a basic expression/literal
     pub lhs: Box<Expr>,
-    /// The haystack, can be a string, an array or an ident only currently
+    // The haystack, can be a string, an array or an ident only currently
     pub rhs: Box<Expr>,
-    /// Is it using `not` as in `b` not in `...`?
+    // Is it using `not` as in `b` not in `...`?
     pub negated: bool,
 }
 
-/// An expression is the node found in variable block, kwargs and conditions.
+// An expression is the node found in variable block, kwargs and conditions.
 #[derive(Clone, Debug, PartialEq)]
 #[allow(missing_docs)]
 pub enum ExprVal {
@@ -166,35 +166,35 @@ pub enum ExprVal {
     In(In),
 }
 
-/// An expression is a value that can be negated and followed by
-/// optional filters
+// An expression is a value that can be negated and followed by
+// optional filters
 #[derive(Clone, Debug, PartialEq)]
 pub struct Expr {
-    /// The expression we are evaluating
+    // The expression we are evaluating
     pub val: ExprVal,
-    /// Is it using `not`?
+    // Is it using `not`?
     pub negated: bool,
-    /// List of filters used on that value
+    // List of filters used on that value
     pub filters: Vec<FunctionCall>,
 }
 
 impl Expr {
-    /// Create a new basic Expr
+    // Create a new basic Expr
     pub fn new(val: ExprVal) -> Expr {
         Expr { val, negated: false, filters: vec![] }
     }
 
-    /// Create a new negated Expr
+    // Create a new negated Expr
     pub fn new_negated(val: ExprVal) -> Expr {
         Expr { val, negated: true, filters: vec![] }
     }
 
-    /// Create a new basic Expr with some filters
+    // Create a new basic Expr with some filters
     pub fn with_filters(val: ExprVal, filters: Vec<FunctionCall>) -> Expr {
         Expr { val, filters, negated: false }
     }
 
-    /// Check if the expr has a default filter as first filter
+    // Check if the expr has a default filter as first filter
     pub fn has_default_filter(&self) -> bool {
         if self.filters.is_empty() {
             return false;
@@ -203,7 +203,7 @@ impl Expr {
         self.filters[0].name == "default"
     }
 
-    /// Check if the last filter is `safe`
+    // Check if the last filter is `safe`
     pub fn is_marked_safe(&self) -> bool {
         if self.filters.is_empty() {
             return false;
@@ -213,135 +213,135 @@ impl Expr {
     }
 }
 
-/// A test node `if my_var is odd`
+// A test node `if my_var is odd`
 #[derive(Clone, Debug, PartialEq)]
 pub struct Test {
-    /// Which variable is evaluated
+    // Which variable is evaluated
     pub ident: String,
-    /// Is it using `not`?
+    // Is it using `not`?
     pub negated: bool,
-    /// Name of the test
+    // Name of the test
     pub name: String,
-    /// Any optional arg given to the test
+    // Any optional arg given to the test
     pub args: Vec<Expr>,
 }
 
-/// A filter section node `{{ filter name(param="value") }} content {{ endfilter }}`
+// A filter section node `{{ filter name(param="value") }} content {{ endfilter }}`
 #[derive(Clone, Debug, PartialEq)]
 pub struct FilterSection {
-    /// The filter call itsel
+    // The filter call itsel
     pub filter: FunctionCall,
-    /// The filter body
+    // The filter body
     pub body: Vec<Node>,
 }
 
-/// Set a variable in the context `{% set val = "hey" %}`
+// Set a variable in the context `{% set val = "hey" %}`
 #[derive(Clone, Debug, PartialEq)]
 pub struct Set {
-    /// The name for that value in the context
+    // The name for that value in the context
     pub key: String,
-    /// The value to assign
+    // The value to assign
     pub value: Expr,
-    /// Whether we want to set the variable globally or locally
-    /// global_set is only useful in loops
+    // Whether we want to set the variable globally or locally
+    // global_set is only useful in loops
     pub global: bool,
 }
 
-/// A call to a namespaced macro `macros::my_macro()`
+// A call to a namespaced macro `macros::my_macro()`
 #[derive(Clone, Debug, PartialEq)]
 pub struct MacroCall {
-    /// The namespace we're looking for that macro in
+    // The namespace we're looking for that macro in
     pub namespace: String,
-    /// The macro name
+    // The macro name
     pub name: String,
-    /// The args for that macro: name -> value
+    // The args for that macro: name -> value
     pub args: HashMap<String, Expr>,
 }
 
-/// A Macro definition
+// A Macro definition
 #[derive(Clone, Debug, PartialEq)]
 pub struct MacroDefinition {
-    /// The macro name
+    // The macro name
     pub name: String,
-    /// The args for that macro: name -> optional default value
+    // The args for that macro: name -> optional default value
     pub args: HashMap<String, Option<Expr>>,
-    /// The macro content
+    // The macro content
     pub body: Vec<Node>,
 }
 
-/// A block definition
+// A block definition
 #[derive(Clone, Debug, PartialEq)]
 pub struct Block {
-    /// The block name
+    // The block name
     pub name: String,
-    /// The block content
+    // The block content
     pub body: Vec<Node>,
 }
 
-/// A forloop: can be over values or key/values
+// A forloop: can be over values or key/values
 #[derive(Clone, Debug, PartialEq)]
 pub struct Forloop {
-    /// Name of the key in the loop (only when iterating on map-like objects)
+    // Name of the key in the loop (only when iterating on map-like objects)
     pub key: Option<String>,
-    /// Name of the local variable for the value in the loop
+    // Name of the local variable for the value in the loop
     pub value: String,
-    /// Expression being iterated on
+    // Expression being iterated on
     pub container: Expr,
-    /// What's in the forloop itself
+    // What's in the forloop itself
     pub body: Vec<Node>,
-    /// The body to execute in case of an empty object
+    // The body to execute in case of an empty object
     pub empty_body: Option<Vec<Node>>,
 }
 
-/// An if/elif/else condition with their respective body
+// An if/elif/else condition with their respective body
 #[derive(Clone, Debug, PartialEq)]
 pub struct If {
-    /// First item if the if, all the ones after are elif
+    // First item if the if, all the ones after are elif
     pub conditions: Vec<(WS, Expr, Vec<Node>)>,
-    /// The optional `else` block
+    // The optional `else` block
     pub otherwise: Option<(WS, Vec<Node>)>,
 }
 
-/// All Tera nodes that can be encountered
+// All Lysine nodes that can be encountered
 #[derive(Clone, Debug, PartialEq)]
 pub enum Node {
-    /// A call to `{{ super() }}` in a block
+    // A call to `{{ super() }}` in a block
     Super,
 
-    /// Some actual text
+    // Some actual text
     Text(String),
-    /// A `{{ }}` block
+    // A `{{ }}` block
     VariableBlock(WS, Expr),
-    /// A `{% macro hello() %}...{% endmacro %}`
+    // A `{% macro hello() %}...{% endmacro %}`
     MacroDefinition(WS, MacroDefinition, WS),
 
-    /// The `{% extends "blabla.html" %}` node, contains the template name
+    // The `{% extends "blabla.html" %}` node, contains the template name
     Extends(WS, String),
-    /// The `{% include "blabla.html" %}` node, contains the template name
+    // The `{% include "blabla.html" %}` node, contains the template name
     Include(WS, Vec<String>, bool),
-    /// The `{% import "macros.html" as macros %}`
+    // The `{% import "macros.html" as macros %}`
     ImportMacro(WS, String, String),
-    /// The `{% set val = something %}` tag
+    // The `{% set val = something %}` tag
     Set(WS, Set),
 
-    /// The text between `{% raw %}` and `{% endraw %}`
+    // The text between `{% raw %}` and `{% endraw %}`
     Raw(WS, String, WS),
 
-    /// A filter section node `{{ filter name(param="value") }} content {{ endfilter }}`
+    // A filter section node `{{ filter name(param="value") }} content {{ endfilter }}`
     FilterSection(WS, FilterSection, WS),
-    /// A `{% block name %}...{% endblock %}`
+    // A `{% block name %}...{% endblock %}`
     Block(WS, Block, WS),
-    /// A `{% for i in items %}...{% endfor %}`
+    // A `{% for i in items %}...{% endfor %}`
     Forloop(WS, Forloop, WS),
 
-    /// A if/elif/else block, WS for the if/elif/else is directly in the struct
+    // A if/elif/else block, WS for the if/elif/else is directly in the struct
     If(If, WS),
 
-    /// The `{% break %}` tag
+    // The `{% break %}` tag
     Break(WS),
-    /// The `{% continue %}` tag
+    // The `{% continue %}` tag
     Continue(WS),
 
-    /// The `{# #} `comment tag and its content
+    // The `{# #} `comment tag and its content
     Comment(WS, String),
 }

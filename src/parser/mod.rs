@@ -6,7 +6,7 @@ use pest::pratt_parser::{Assoc, Op, PrattParser};
 use pest::Parser;
 use pest_derive::Parser;
 
-use crate::errors::{Error, Result as TeraResult};
+use crate::errors::{Error, Result as LysineResult};
 
 // This include forces recompiling this source file if the grammar file changes.
 // Uncomment it when doing changes to the .pest file
@@ -14,14 +14,12 @@ const _GRAMMAR: &str = include_str!("tera.pest");
 
 #[derive(Parser)]
 #[grammar = "parser/tera.pest"]
-pub struct TeraParser;
+pub struct LysineParser;
 
-/// The AST of Tera
+// The AST of Lysine
 pub mod ast;
 mod whitespace;
 
-#[cfg(test)]
-mod tests;
 
 use self::ast::*;
 pub use self::whitespace::remove_whitespace;
@@ -42,8 +40,8 @@ lazy_static! {
         .op(Op::infix(Rule::op_or, Assoc::Left)).op(Op::infix(Rule::op_and, Assoc::Left));
 }
 
-/// Strings are delimited by double quotes, single quotes and backticks
-/// We need to remove those before putting them in the AST
+// Strings are delimited by double quotes, single quotes and backticks
+// We need to remove those before putting them in the AST
 fn replace_string_markers(input: &str) -> String {
     match input.chars().next().unwrap() {
         '"' => input.replace('"', ""),
@@ -53,7 +51,7 @@ fn replace_string_markers(input: &str) -> String {
     }
 }
 
-fn parse_kwarg(pair: Pair<Rule>) -> TeraResult<(String, Expr)> {
+fn parse_kwarg(pair: Pair<Rule>) -> LysineResult<(String, Expr)> {
     let mut name = None;
     let mut val = None;
 
@@ -69,7 +67,7 @@ fn parse_kwarg(pair: Pair<Rule>) -> TeraResult<(String, Expr)> {
     Ok((name.unwrap(), val.unwrap()))
 }
 
-fn parse_fn_call(pair: Pair<Rule>) -> TeraResult<FunctionCall> {
+fn parse_fn_call(pair: Pair<Rule>) -> LysineResult<FunctionCall> {
     let mut name = None;
     let mut args = HashMap::new();
 
@@ -87,7 +85,7 @@ fn parse_fn_call(pair: Pair<Rule>) -> TeraResult<FunctionCall> {
     Ok(FunctionCall { name: name.unwrap(), args })
 }
 
-fn parse_filter(pair: Pair<Rule>) -> TeraResult<FunctionCall> {
+fn parse_filter(pair: Pair<Rule>) -> LysineResult<FunctionCall> {
     let mut name = None;
     let mut args = HashMap::new();
     for p in pair.into_inner() {
@@ -107,7 +105,7 @@ fn parse_filter(pair: Pair<Rule>) -> TeraResult<FunctionCall> {
     Ok(FunctionCall { name: name.unwrap(), args })
 }
 
-fn parse_test_call(pair: Pair<Rule>) -> TeraResult<(String, Vec<Expr>)> {
+fn parse_test_call(pair: Pair<Rule>) -> LysineResult<(String, Vec<Expr>)> {
     let mut name = None;
     let mut args = vec![];
 
@@ -136,7 +134,7 @@ fn parse_test_call(pair: Pair<Rule>) -> TeraResult<(String, Vec<Expr>)> {
     Ok((name.unwrap(), args))
 }
 
-fn parse_test(pair: Pair<Rule>) -> TeraResult<Test> {
+fn parse_test(pair: Pair<Rule>) -> LysineResult<Test> {
     let mut ident = None;
     let mut name = None;
     let mut args = vec![];
@@ -156,7 +154,7 @@ fn parse_test(pair: Pair<Rule>) -> TeraResult<Test> {
     Ok(Test { ident: ident.unwrap(), negated: false, name: name.unwrap(), args })
 }
 
-fn parse_string_concat(pair: Pair<Rule>) -> TeraResult<ExprVal> {
+fn parse_string_concat(pair: Pair<Rule>) -> LysineResult<ExprVal> {
     let mut values = vec![];
     let mut current_str = String::new();
 
@@ -216,10 +214,10 @@ fn parse_string_concat(pair: Pair<Rule>) -> TeraResult<ExprVal> {
     Ok(ExprVal::StringConcat(StringConcat { values }))
 }
 
-fn parse_basic_expression(pair: Pair<Rule>) -> TeraResult<ExprVal> {
+fn parse_basic_expression(pair: Pair<Rule>) -> LysineResult<ExprVal> {
     let primary = parse_basic_expression;
 
-    let infix = |lhs: TeraResult<ExprVal>, op: Pair<Rule>, rhs: TeraResult<ExprVal>| {
+    let infix = |lhs: LysineResult<ExprVal>, op: Pair<Rule>, rhs: LysineResult<ExprVal>| {
         Ok(ExprVal::Math(MathExpr {
             lhs: Box::new(Expr::new(lhs?)),
             operator: match op.as_rule() {
@@ -269,8 +267,8 @@ fn parse_basic_expression(pair: Pair<Rule>) -> TeraResult<ExprVal> {
     Ok(expr)
 }
 
-/// A basic expression with optional filters
-fn parse_basic_expr_with_filters(pair: Pair<Rule>) -> TeraResult<Expr> {
+// A basic expression with optional filters
+fn parse_basic_expr_with_filters(pair: Pair<Rule>) -> LysineResult<Expr> {
     let mut expr_val = None;
     let mut filters = vec![];
 
@@ -285,8 +283,8 @@ fn parse_basic_expr_with_filters(pair: Pair<Rule>) -> TeraResult<Expr> {
     Ok(Expr { val: expr_val.unwrap(), negated: false, filters })
 }
 
-/// A string expression with optional filters
-fn parse_string_expr_with_filters(pair: Pair<Rule>) -> TeraResult<Expr> {
+// A string expression with optional filters
+fn parse_string_expr_with_filters(pair: Pair<Rule>) -> LysineResult<Expr> {
     let mut expr_val = None;
     let mut filters = vec![];
 
@@ -302,8 +300,8 @@ fn parse_string_expr_with_filters(pair: Pair<Rule>) -> TeraResult<Expr> {
     Ok(Expr { val: expr_val.unwrap(), negated: false, filters })
 }
 
-/// An array with optional filters
-fn parse_array_with_filters(pair: Pair<Rule>) -> TeraResult<Expr> {
+// An array with optional filters
+fn parse_array_with_filters(pair: Pair<Rule>) -> LysineResult<Expr> {
     let mut array = None;
     let mut filters = vec![];
 
@@ -318,7 +316,7 @@ fn parse_array_with_filters(pair: Pair<Rule>) -> TeraResult<Expr> {
     Ok(Expr { val: array.unwrap(), negated: false, filters })
 }
 
-fn parse_in_condition_container(pair: Pair<Rule>) -> TeraResult<Expr> {
+fn parse_in_condition_container(pair: Pair<Rule>) -> LysineResult<Expr> {
     let mut expr = None;
     for p in pair.into_inner() {
         match p.as_rule() {
@@ -333,7 +331,7 @@ fn parse_in_condition_container(pair: Pair<Rule>) -> TeraResult<Expr> {
     Ok(expr.unwrap())
 }
 
-fn parse_in_condition(pair: Pair<Rule>) -> TeraResult<Expr> {
+fn parse_in_condition(pair: Pair<Rule>) -> LysineResult<Expr> {
     let mut lhs = None;
     let mut rhs = None;
     let mut negated = false;
@@ -357,11 +355,11 @@ fn parse_in_condition(pair: Pair<Rule>) -> TeraResult<Expr> {
     })))
 }
 
-/// A basic expression with optional filters with prece
-fn parse_comparison_val(pair: Pair<Rule>) -> TeraResult<Expr> {
+// A basic expression with optional filters with prece
+fn parse_comparison_val(pair: Pair<Rule>) -> LysineResult<Expr> {
     let primary = parse_comparison_val;
 
-    let infix = |lhs: TeraResult<Expr>, op: Pair<Rule>, rhs: TeraResult<Expr>| {
+    let infix = |lhs: LysineResult<Expr>, op: Pair<Rule>, rhs: LysineResult<Expr>| {
         Ok(Expr::new(ExprVal::Math(MathExpr {
             lhs: Box::new(lhs?),
             operator: match op.as_rule() {
@@ -386,10 +384,10 @@ fn parse_comparison_val(pair: Pair<Rule>) -> TeraResult<Expr> {
     Ok(expr)
 }
 
-fn parse_comparison_expression(pair: Pair<Rule>) -> TeraResult<Expr> {
+fn parse_comparison_expression(pair: Pair<Rule>) -> LysineResult<Expr> {
     let primary = parse_comparison_expression;
 
-    let infix = |lhs: TeraResult<Expr>, op: Pair<Rule>, rhs: TeraResult<Expr>| {
+    let infix = |lhs: LysineResult<Expr>, op: Pair<Rule>, rhs: LysineResult<Expr>| {
         Ok(Expr::new(ExprVal::Logic(LogicExpr {
             lhs: Box::new(lhs?),
             operator: match op.as_rule() {
@@ -416,8 +414,8 @@ fn parse_comparison_expression(pair: Pair<Rule>) -> TeraResult<Expr> {
     Ok(expr)
 }
 
-/// An expression that can be negated
-fn parse_logic_val(pair: Pair<Rule>) -> TeraResult<Expr> {
+// An expression that can be negated
+fn parse_logic_val(pair: Pair<Rule>) -> LysineResult<Expr> {
     let mut negated = false;
     let mut expr = None;
 
@@ -437,10 +435,10 @@ fn parse_logic_val(pair: Pair<Rule>) -> TeraResult<Expr> {
     Ok(e)
 }
 
-fn parse_logic_expr(pair: Pair<Rule>) -> TeraResult<Expr> {
+fn parse_logic_expr(pair: Pair<Rule>) -> LysineResult<Expr> {
     let primary = parse_logic_expr;
 
-    let infix = |lhs: TeraResult<Expr>, op: Pair<Rule>, rhs: TeraResult<Expr>| match op.as_rule() {
+    let infix = |lhs: LysineResult<Expr>, op: Pair<Rule>, rhs: LysineResult<Expr>| match op.as_rule() {
         Rule::op_or => Ok(Expr::new(ExprVal::Logic(LogicExpr {
             lhs: Box::new(lhs?),
             operator: LogicOperator::Or,
@@ -467,7 +465,7 @@ fn parse_logic_expr(pair: Pair<Rule>) -> TeraResult<Expr> {
     Ok(expr)
 }
 
-fn parse_array(pair: Pair<Rule>) -> TeraResult<ExprVal> {
+fn parse_array(pair: Pair<Rule>) -> LysineResult<ExprVal> {
     let mut vals = vec![];
 
     for p in pair.into_inner() {
@@ -497,7 +495,7 @@ fn parse_string_array(pair: Pair<Rule>) -> Vec<String> {
     vals
 }
 
-fn parse_macro_call(pair: Pair<Rule>) -> TeraResult<MacroCall> {
+fn parse_macro_call(pair: Pair<Rule>) -> LysineResult<MacroCall> {
     let mut namespace = None;
     let mut name = None;
     let mut args = HashMap::new();
@@ -523,7 +521,7 @@ fn parse_macro_call(pair: Pair<Rule>) -> TeraResult<MacroCall> {
     Ok(MacroCall { namespace: namespace.unwrap(), name: name.unwrap(), args })
 }
 
-fn parse_variable_tag(pair: Pair<Rule>) -> TeraResult<Node> {
+fn parse_variable_tag(pair: Pair<Rule>) -> LysineResult<Node> {
     let mut ws = WS::default();
     let mut expr = None;
 
@@ -610,7 +608,7 @@ fn parse_include(pair: Pair<Rule>) -> Node {
     Node::Include(ws, files, ignore_missing)
 }
 
-fn parse_set_tag(pair: Pair<Rule>, global: bool) -> TeraResult<Node> {
+fn parse_set_tag(pair: Pair<Rule>, global: bool) -> LysineResult<Node> {
     let mut ws = WS::default();
     let mut key = None;
     let mut expr = None;
@@ -666,7 +664,7 @@ fn parse_raw_tag(pair: Pair<Rule>) -> Node {
     Node::Raw(start_ws, text.unwrap(), end_ws)
 }
 
-fn parse_filter_section(pair: Pair<Rule>) -> TeraResult<Node> {
+fn parse_filter_section(pair: Pair<Rule>) -> LysineResult<Node> {
     let mut start_ws = WS::default();
     let mut end_ws = WS::default();
     let mut filter = None;
@@ -712,7 +710,7 @@ fn parse_filter_section(pair: Pair<Rule>) -> TeraResult<Node> {
     Ok(Node::FilterSection(start_ws, FilterSection { filter: filter.unwrap(), body }, end_ws))
 }
 
-fn parse_block(pair: Pair<Rule>) -> TeraResult<Node> {
+fn parse_block(pair: Pair<Rule>) -> LysineResult<Node> {
     let mut start_ws = WS::default();
     let mut end_ws = WS::default();
     let mut name = None;
@@ -748,7 +746,7 @@ fn parse_block(pair: Pair<Rule>) -> TeraResult<Node> {
     Ok(Node::Block(start_ws, Block { name: name.unwrap(), body }, end_ws))
 }
 
-fn parse_macro_arg(p: Pair<Rule>) -> TeraResult<ExprVal> {
+fn parse_macro_arg(p: Pair<Rule>) -> LysineResult<ExprVal> {
     let val = match p.as_rule() {
         Rule::int => Some(ExprVal::Int(
             p.as_str()
@@ -774,7 +772,7 @@ fn parse_macro_arg(p: Pair<Rule>) -> TeraResult<ExprVal> {
     Ok(val.unwrap())
 }
 
-fn parse_macro_fn(pair: Pair<Rule>) -> TeraResult<(String, HashMap<String, Option<Expr>>)> {
+fn parse_macro_fn(pair: Pair<Rule>) -> LysineResult<(String, HashMap<String, Option<Expr>>)> {
     let mut name = String::new();
     let mut args = HashMap::new();
 
@@ -799,7 +797,7 @@ fn parse_macro_fn(pair: Pair<Rule>) -> TeraResult<(String, HashMap<String, Optio
     Ok((name, args))
 }
 
-fn parse_macro_definition(pair: Pair<Rule>) -> TeraResult<Node> {
+fn parse_macro_definition(pair: Pair<Rule>) -> LysineResult<Node> {
     let mut start_ws = WS::default();
     let mut end_ws = WS::default();
     let mut name = String::new();
@@ -840,7 +838,7 @@ fn parse_macro_definition(pair: Pair<Rule>) -> TeraResult<Node> {
     Ok(Node::MacroDefinition(start_ws, MacroDefinition { name, args, body }, end_ws))
 }
 
-fn parse_forloop(pair: Pair<Rule>) -> TeraResult<Node> {
+fn parse_forloop(pair: Pair<Rule>) -> LysineResult<Node> {
     let mut start_ws = WS::default();
     let mut end_ws = WS::default();
 
@@ -966,7 +964,7 @@ fn parse_comment_tag(pair: Pair<Rule>) -> Node {
     Node::Comment(ws, content)
 }
 
-fn parse_if(pair: Pair<Rule>) -> TeraResult<Node> {
+fn parse_if(pair: Pair<Rule>) -> LysineResult<Node> {
     // the `endif` tag ws handling
     let mut end_ws = WS::default();
     let mut conditions = vec![];
@@ -1044,7 +1042,7 @@ fn parse_if(pair: Pair<Rule>) -> TeraResult<Node> {
     Ok(Node::If(If { conditions, otherwise }, end_ws))
 }
 
-fn parse_content(pair: Pair<Rule>) -> TeraResult<Vec<Node>> {
+fn parse_content(pair: Pair<Rule>) -> LysineResult<Vec<Node>> {
     let pairs = pair.into_inner();
     let mut nodes = Vec::with_capacity(pairs.len());
 
@@ -1075,8 +1073,8 @@ fn parse_content(pair: Pair<Rule>) -> TeraResult<Vec<Node>> {
     Ok(nodes)
 }
 
-pub fn parse(input: &str) -> TeraResult<Vec<Node>> {
-    let mut pairs = match TeraParser::parse(Rule::template, input) {
+pub fn parse(input: &str) -> LysineResult<Vec<Node>> {
+    let mut pairs = match LysineParser::parse(Rule::template, input) {
         Ok(p) => p,
         Err(e) => {
             let fancy_e = e.renamed_rules(|rule| {

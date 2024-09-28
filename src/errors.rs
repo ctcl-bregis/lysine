@@ -2,64 +2,64 @@ use std::convert::Into;
 use std::error::Error as StdError;
 use std::fmt;
 
-/// The kind of an error (non-exhaustive)
+// The kind of an error (non-exhaustive)
 #[derive(Debug)]
 #[allow(clippy::manual_non_exhaustive)] // reason = "we want to stay backwards compatible, therefore we keep the manual implementation of non_exhaustive"
 pub enum ErrorKind {
-    /// Generic error
+    // Generic error
     Msg(String),
-    /// A loop was found while looking up the inheritance chain
+    // A loop was found while looking up the inheritance chain
     CircularExtend {
         /// Name of the template with the loop
         tpl: String,
         /// All the parents templates we found so far
         inheritance_chain: Vec<String>,
     },
-    /// A template is extending a template that wasn't found in the Tera instance
+    // A template is extending a template that wasn't found in the Tera instance
     MissingParent {
         /// The template we are currently looking at
         current: String,
         /// The missing template
         parent: String,
     },
-    /// A template was missing (more generic version of MissingParent)
+    // A template was missing (more generic version of MissingParent)
     TemplateNotFound(String),
-    /// A filter wasn't found
+    // A filter wasn't found
     FilterNotFound(String),
-    /// A test wasn't found
+    // A test wasn't found
     TestNotFound(String),
-    /// A macro was defined in the middle of a template
+    // A macro was defined in the middle of a template
     InvalidMacroDefinition(String),
-    /// A function wasn't found
+    // A function wasn't found
     FunctionNotFound(String),
-    /// An error happened while serializing JSON
+    // An error happened while serializing JSON
     Json(serde_json::Error),
-    /// An error occured while executing a function.
+    // An error occured while executing a function.
     CallFunction(String),
-    /// An error occured while executing a filter.
+    // An error occured while executing a filter.
     CallFilter(String),
-    /// An error occured while executing a test.
+    // An error occured while executing a test.
     CallTest(String),
-    /// An IO error occured
+    // An IO error occured
     Io(std::io::ErrorKind),
-    /// UTF-8 conversion error
-    ///
-    /// This should not occur unless invalid UTF8 chars are rendered
+    // UTF-8 conversion error
+    //
+    // This should not occur unless invalid UTF8 chars are rendered
     Utf8Conversion {
         /// The context that indicates where the error occurs in the rendering process
         context: String,
     },
-    /// This enum may grow additional variants, so this makes sure clients
-    /// don't count on exhaustive matching. (Otherwise, adding a new variant
-    /// could break existing code.)
+    // This enum may grow additional variants, so this makes sure clients
+    // don't count on exhaustive matching. (Otherwise, adding a new variant
+    // could break existing code.)
     #[doc(hidden)]
     __Nonexhaustive,
 }
 
-/// The Error type
+// The Error type
 #[derive(Debug)]
 pub struct Error {
-    /// Kind of error
+    // Kind of error
     pub kind: ErrorKind,
     source: Option<Box<dyn StdError + Sync + Send>>,
 }
@@ -107,12 +107,12 @@ impl StdError for Error {
 }
 
 impl Error {
-    /// Creates generic error
+    // Creates generic error
     pub fn msg(value: impl ToString) -> Self {
         Self { kind: ErrorKind::Msg(value.to_string()), source: None }
     }
 
-    /// Creates a circular extend error
+    // Creates a circular extend error
     pub fn circular_extend(tpl: impl ToString, inheritance_chain: Vec<String>) -> Self {
         Self {
             kind: ErrorKind::CircularExtend { tpl: tpl.to_string(), inheritance_chain },
@@ -120,7 +120,7 @@ impl Error {
         }
     }
 
-    /// Creates a missing parent error
+    // Creates a missing parent error
     pub fn missing_parent(current: impl ToString, parent: impl ToString) -> Self {
         Self {
             kind: ErrorKind::MissingParent {
@@ -131,32 +131,32 @@ impl Error {
         }
     }
 
-    /// Creates a template not found error
+    // Creates a template not found error
     pub fn template_not_found(tpl: impl ToString) -> Self {
         Self { kind: ErrorKind::TemplateNotFound(tpl.to_string()), source: None }
     }
 
-    /// Creates a filter not found error
+    // Creates a filter not found error
     pub fn filter_not_found(name: impl ToString) -> Self {
         Self { kind: ErrorKind::FilterNotFound(name.to_string()), source: None }
     }
 
-    /// Creates a test not found error
+    // Creates a test not found error
     pub fn test_not_found(name: impl ToString) -> Self {
         Self { kind: ErrorKind::TestNotFound(name.to_string()), source: None }
     }
 
-    /// Creates a function not found error
+    // Creates a function not found error
     pub fn function_not_found(name: impl ToString) -> Self {
         Self { kind: ErrorKind::FunctionNotFound(name.to_string()), source: None }
     }
 
-    /// Creates generic error with a source
+    // Creates generic error with a source
     pub fn chain(value: impl ToString, source: impl Into<Box<dyn StdError + Send + Sync>>) -> Self {
         Self { kind: ErrorKind::Msg(value.to_string()), source: Some(source.into()) }
     }
 
-    /// Creates an error wrapping a failed function call.
+    // Creates an error wrapping a failed function call.
     pub fn call_function(
         name: impl ToString,
         source: impl Into<Box<dyn StdError + Send + Sync>>,
@@ -164,7 +164,7 @@ impl Error {
         Self { kind: ErrorKind::CallFunction(name.to_string()), source: Some(source.into()) }
     }
 
-    /// Creates an error wrapping a failed filter call.
+    // Creates an error wrapping a failed filter call.
     pub fn call_filter(
         name: impl ToString,
         source: impl Into<Box<dyn StdError + Send + Sync>>,
@@ -172,7 +172,7 @@ impl Error {
         Self { kind: ErrorKind::CallFilter(name.to_string()), source: Some(source.into()) }
     }
 
-    /// Creates an error wrapping a failed test call.
+    // Creates an error wrapping a failed test call.
     pub fn call_test(
         name: impl ToString,
         source: impl Into<Box<dyn StdError + Send + Sync>>,
@@ -180,22 +180,22 @@ impl Error {
         Self { kind: ErrorKind::CallTest(name.to_string()), source: Some(source.into()) }
     }
 
-    /// Creates JSON error
+    // Creates JSON error
     pub fn json(value: serde_json::Error) -> Self {
         Self { kind: ErrorKind::Json(value), source: None }
     }
 
-    /// Creates an invalid macro definition error
+    // Creates an invalid macro definition error
     pub fn invalid_macro_def(name: impl ToString) -> Self {
         Self { kind: ErrorKind::InvalidMacroDefinition(name.to_string()), source: None }
     }
 
-    /// Creates an IO error
+    // Creates an IO error
     pub fn io_error(error: std::io::Error) -> Self {
         Self { kind: ErrorKind::Io(error.kind()), source: Some(Box::new(error)) }
     }
 
-    /// Creates an utf8 conversion error
+    // Creates an utf8 conversion error
     pub fn utf8_conversion_error(error: std::string::FromUtf8Error, context: String) -> Self {
         Self { kind: ErrorKind::Utf8Conversion { context }, source: Some(Box::new(error)) }
     }
@@ -221,7 +221,7 @@ impl From<serde_json::Error> for Error {
         Self::json(e)
     }
 }
-/// Convenient wrapper around std::Result.
+// Convenient wrapper around std::Result.
 pub type Result<T> = ::std::result::Result<T, Error>;
 
 #[cfg(test)]
