@@ -36,11 +36,7 @@ impl<'a> MacroCollection<'a> {
     // happen recursively. We need all of the macros loaded in one go to be in the same
     // HashMap for easy popping as well, otherwise there could be stray macro
     // definitions remaining
-    pub fn add_macros_from_template(
-        &mut self,
-        tera: &'a Lysine,
-        template: &'a Template,
-    ) -> Result<()> {
+    pub fn add_macros_from_template(&mut self, lysine: &'a Lysine, template: &'a Template) -> Result<()> {
         let template_name = &template.name[..];
         if self.macros.contains_key(template_name) {
             return Ok(());
@@ -53,9 +49,9 @@ impl<'a> MacroCollection<'a> {
         }
 
         for (filename, namespace) in &template.imported_macro_files {
-            let macro_tpl = tera.get_template(filename)?;
+            let macro_tpl = lysine.get_template(filename)?;
             macro_namespace_map.insert(namespace, (filename, &macro_tpl.macros));
-            self.add_macros_from_template(tera, macro_tpl)?;
+            self.add_macros_from_template(lysine, macro_tpl)?;
 
             // We need to load the macros loaded in our macros in our namespace as well, unless we override it
             for (namespace, m) in &self.macros[&macro_tpl.name.as_ref()].clone() {
@@ -71,8 +67,8 @@ impl<'a> MacroCollection<'a> {
 
         for parent in &template.parents {
             let parent = &parent[..];
-            let parent_template = tera.get_template(parent)?;
-            self.add_macros_from_template(tera, parent_template)?;
+            let parent_template = lysine.get_template(parent)?;
+            self.add_macros_from_template(lysine, parent_template)?;
 
             // We need to load the parent macros in our namespace as well, unless we override it
             for (namespace, m) in &self.macros[parent].clone() {
@@ -87,12 +83,7 @@ impl<'a> MacroCollection<'a> {
         Ok(())
     }
 
-    pub fn lookup_macro(
-        &self,
-        template_name: &'a str,
-        macro_namespace: &'a str,
-        macro_name: &'a str,
-    ) -> Result<(&'a str, &'a MacroDefinition)> {
+    pub fn lookup_macro(&self, template_name: &'a str, macro_namespace: &'a str, macro_name: &'a str) -> Result<(&'a str, &'a MacroDefinition)> {
         let namespace = self
             .macros
             .get(template_name)

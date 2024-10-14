@@ -134,13 +134,13 @@ pub fn throw(args: &HashMap<String, Value>) -> Result<Value> {
 }
 
 
-pub fn get_random(args: &HashMap<String, Value>) -> Result<Value> {
+pub fn random_int(args: &HashMap<String, Value>) -> Result<Value> {
     let start = match args.get("start") {
         Some(val) => match from_value::<isize>(val.clone()) {
             Ok(v) => v,
             Err(_) => {
                 return Err(Error::msg(format!(
-                    "Function `get_random` received start={} but `start` can only be a number",
+                    "Function `random_int` received start={} but `start` can only be a number",
                     val
                 )));
             }
@@ -153,12 +153,12 @@ pub fn get_random(args: &HashMap<String, Value>) -> Result<Value> {
             Ok(v) => v,
             Err(_) => {
                 return Err(Error::msg(format!(
-                    "Function `get_random` received end={} but `end` can only be a number",
+                    "Function `random_int` received end={} but `end` can only be a number",
                     val
                 )));
             }
         },
-        None => return Err(Error::msg("Function `get_random` didn't receive an `end` argument")),
+        None => return Err(Error::msg("Function `random_int` didn't receive an `end` argument")),
     };
     let mut rng = rand::thread_rng();
     let res = rng.gen_range(start..end);

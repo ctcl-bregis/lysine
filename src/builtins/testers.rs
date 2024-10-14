@@ -207,10 +207,7 @@ pub fn matching(value: Option<&Value>, params: &[Value]) -> Result<bool> {
     let regex = match Regex::new(regex) {
         Ok(regex) => regex,
         Err(err) => {
-            return Err(Error::msg(format!(
-                "Tester `matching`: Invalid regular expression: {}",
-                err
-            )));
+            return Err(Error::msg(format!("Tester `matching`: Invalid regular expression: {err}")));
         }
     };
 

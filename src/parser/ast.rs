@@ -22,7 +22,7 @@ pub enum MathOperator {
     // /
     Div,
     // %
-    Modulo,
+    Modulo
 }
 
 impl fmt::Display for MathOperator {
@@ -35,7 +35,7 @@ impl fmt::Display for MathOperator {
                 MathOperator::Sub => "-",
                 MathOperator::Mul => "*",
                 MathOperator::Div => "/",
-                MathOperator::Modulo => "%",
+                MathOperator::Modulo => "%"
             }
         )
     }
@@ -142,7 +142,7 @@ pub struct In {
     // The haystack, can be a string, an array or an ident only currently
     pub rhs: Box<Expr>,
     // Is it using `not` as in `b` not in `...`?
-    pub negated: bool,
+    pub negated: bool
 }
 
 // An expression is the node found in variable block, kwargs and conditions.
@@ -163,7 +163,7 @@ pub enum ExprVal {
     // on values inside arrays
     Array(Vec<Expr>),
     StringConcat(StringConcat),
-    In(In),
+    In(In)
 }
 
 // An expression is a value that can be negated and followed by
@@ -175,7 +175,7 @@ pub struct Expr {
     // Is it using `not`?
     pub negated: bool,
     // List of filters used on that value
-    pub filters: Vec<FunctionCall>,
+    pub filters: Vec<FunctionCall>
 }
 
 impl Expr {
@@ -223,7 +223,7 @@ pub struct Test {
     // Name of the test
     pub name: String,
     // Any optional arg given to the test
-    pub args: Vec<Expr>,
+    pub args: Vec<Expr>
 }
 
 // A filter section node `{{ filter name(param="value") }} content {{ endfilter }}`
@@ -232,7 +232,7 @@ pub struct FilterSection {
     // The filter call itsel
     pub filter: FunctionCall,
     // The filter body
-    pub body: Vec<Node>,
+    pub body: Vec<Node>
 }
 
 // Set a variable in the context `{% set val = "hey" %}`
@@ -244,7 +244,7 @@ pub struct Set {
     pub value: Expr,
     // Whether we want to set the variable globally or locally
     // global_set is only useful in loops
-    pub global: bool,
+    pub global: bool
 }
 
 // A call to a namespaced macro `macros::my_macro()`
@@ -255,7 +255,7 @@ pub struct MacroCall {
     // The macro name
     pub name: String,
     // The args for that macro: name -> value
-    pub args: HashMap<String, Expr>,
+    pub args: HashMap<String, Expr>
 }
 
 // A Macro definition
@@ -266,7 +266,7 @@ pub struct MacroDefinition {
     // The args for that macro: name -> optional default value
     pub args: HashMap<String, Option<Expr>>,
     // The macro content
-    pub body: Vec<Node>,
+    pub body: Vec<Node>
 }
 
 // A block definition
@@ -275,7 +275,7 @@ pub struct Block {
     // The block name
     pub name: String,
     // The block content
-    pub body: Vec<Node>,
+    pub body: Vec<Node>
 }
 
 // A forloop: can be over values or key/values
@@ -290,7 +290,7 @@ pub struct Forloop {
     // What's in the forloop itself
     pub body: Vec<Node>,
     // The body to execute in case of an empty object
-    pub empty_body: Option<Vec<Node>>,
+    pub empty_body: Option<Vec<Node>>
 }
 
 // An if/elif/else condition with their respective body
@@ -299,7 +299,7 @@ pub struct If {
     // First item if the if, all the ones after are elif
     pub conditions: Vec<(WS, Expr, Vec<Node>)>,
     // The optional `else` block
-    pub otherwise: Option<(WS, Vec<Node>)>,
+    pub otherwise: Option<(WS, Vec<Node>)>
 }
 
 // All Lysine nodes that can be encountered
@@ -343,5 +343,5 @@ pub enum Node {
     Continue(WS),
 
     // The `{# #} `comment tag and its content
-    Comment(WS, String),
+    Comment(WS, String)
 }

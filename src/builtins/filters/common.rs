@@ -172,9 +172,7 @@ pub fn date(value: &Value, args: &HashMap<String, Value>) -> Result<Value> {
     let formatted = match value {
         Value::Number(n) => match n.as_i64() {
             Some(i) => {
-                let date = DateTime::from_timestamp(i, 0).expect(
-                    "out of bound seconds should not appear, as we set nanoseconds to zero",
-                );
+                let date = DateTime::from_timestamp(i, 0).expect("out of bound seconds should not appear, as nanoseconds are set to zero");
                 match timezone {
                     Some(timezone) => timezone.from_utc_datetime(&date.naive_utc()).format(&format),
                     None => date.format(&format),
@@ -195,7 +193,7 @@ pub fn date(value: &Value, args: &HashMap<String, Value>) -> Result<Value> {
                         }
                         Err(_) => {
                             return Err(Error::msg(format!(
-                                "Error parsing `{:?}` as rfc3339 date or naive datetime",
+                                "Error parsing `{:?}` as RFC3339 date or naive datetime",
                                 s
                             )));
                         }

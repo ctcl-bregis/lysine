@@ -1,9 +1,9 @@
-<img src="lysine_logo.svg" style="width: 25%" alt="Lysine"/>
+<img src="lysine.svg" style="width: 25%" alt="Lysine"/>
 
 # Lysine
-Lysine is a preprocessor scripting language for webpages meant to replace SCSS in my projects.
+Lysine is a preprocessor/templating scripting language for webpages.
 
-Lysine itself is a fork of Tera. 
+The Rust version of Lysine itself is a fork of Tera. 
 
 ## Name
 The name is based on the mechanism of action of the medication, lisdexamfetamine. An analogy would be lisdexamfetamine (lysine markup) is metabolized by red blood cells (compiled) into dextroamphetamine (CSS). The basis of the name is mostly inspired by my interest in ADHD treatments along with it being one of the most well known examples of lysine being used this way.

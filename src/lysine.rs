@@ -36,8 +36,6 @@ pub struct Lysine {
     pub testers: HashMap<String, Arc<dyn Test>>,
     #[doc(hidden)]
     pub functions: HashMap<String, Arc<dyn Function>>,
-    // Which extensions does Lysine automatically autoescape on.
-    // Defaults to [".html", ".htm", ".xml"]
     #[doc(hidden)]
     pub autoescape_suffixes: Vec<&'static str>,
     #[doc(hidden)]
@@ -53,25 +51,25 @@ impl Lysine {
             )));
         }
 
-        let mut tera = Lysine {
+        let mut lysine = Lysine {
             glob: Some(dir.to_string()),
             templates: HashMap::new(),
             filters: HashMap::new(),
             functions: HashMap::new(),
             testers: HashMap::new(),
-            autoescape_suffixes: vec![".html", ".htm", ".xml"],
+            autoescape_suffixes: vec![".lisc", ".lism", ".lish"],
             escape_fn: escape_html,
         };
 
-        tera.load_from_glob()?;
+        lysine.load_from_glob()?;
         if !parse_only {
-            tera.build_inheritance_chains()?;
-            tera.check_macro_files()?;
+            lysine.build_inheritance_chains()?;
+            lysine.check_macro_files()?;
         }
-        tera.register_tera_filters();
-        tera.register_tera_testers();
-        tera.register_tera_functions();
-        Ok(tera)
+        lysine.register_lysine_filters();
+        lysine.register_lysine_testers();
+        lysine.register_lysine_functions();
+        Ok(lysine)
     }
 
     pub fn new(dir: &str) -> Result<Lysine> {
@@ -102,14 +100,14 @@ impl Lysine {
 
         // Need to canonicalize the glob path because globwalk always returns
         // an empty list for paths starting with `./` or `../`.
-        // See https://github.com/Keats/tera/issues/574 for the Lysine discussion
+        // See https://github.com/Keats/lysine/issues/574 for the Lysine discussion
         // and https://github.com/Gilnaa/globwalk/issues/28 for the upstream issue.
         let (parent_dir, glob_end) = glob.split_at(glob.find('*').unwrap());
         let parent_dir = match std::fs::canonicalize(parent_dir) {
             Ok(d) => d,
             // If canonicalize fails, just abort it and resume with the given path.
             // Consumers expect invalid globs to just return the empty set instead of failing.
-            // See https://github.com/Keats/tera/issues/819#issuecomment-1480392230
+            // See https://github.com/Keats/lysine/issues/819#issuecomment-1480392230
             Err(_) => std::path::PathBuf::from(parent_dir),
         };
         let dir = parent_dir.join(glob_end).into_os_string().into_string().unwrap();
@@ -138,7 +136,7 @@ impl Lysine {
                 if let Err(e) = self.add_file(Some(&filepath), path) {
                     use std::error::Error;
 
-                    errors += &format!("\n* {}", e);
+                    errors += &format!("\n- {}", e);
                     let mut cause = e.source();
                     while let Some(e) = cause {
                         errors += &format!("\n{}", e);
@@ -296,13 +294,13 @@ impl Lysine {
     }
 
     pub fn one_off(input: &str, context: &Context, autoescape: bool) -> Result<String> {
-        let mut tera = Lysine::default();
+        let mut lysine = Lysine::default();
 
         if autoescape {
-            tera.autoescape_on(vec![ONE_OFF_TEMPLATE_NAME]);
+            lysine.autoescape_on(vec![ONE_OFF_TEMPLATE_NAME]);
         }
 
-        tera.render_str(input, context)
+        lysine.render_str(input, context)
     }
 
     #[doc(hidden)]
@@ -383,7 +381,7 @@ impl Lysine {
     #[inline]
     pub fn get_tester(&self, tester_name: &str) -> Result<&dyn Test> {
         match self.testers.get(tester_name) {
-            Some(t) => Ok(&**t),
+            Some(test) => Ok(&**test),
             None => Err(Error::test_not_found(tester_name)),
         }
     }
@@ -396,7 +394,7 @@ impl Lysine {
     #[inline]
     pub fn get_function(&self, fn_name: &str) -> Result<&dyn Function> {
         match self.functions.get(fn_name) {
-            Some(t) => Ok(&**t),
+            Some(fun) => Ok(&**fun),
             None => Err(Error::function_not_found(fn_name)),
         }
     }
@@ -405,7 +403,7 @@ impl Lysine {
         self.functions.insert(name.to_string(), Arc::new(function));
     }
 
-    fn register_tera_filters(&mut self) {
+    fn register_lysine_filters(&mut self) {
         self.register_filter("upper", string::upper);
         self.register_filter("lower", string::lower);
         self.register_filter("trim", string::trim);
@@ -464,7 +462,7 @@ impl Lysine {
         self.register_filter("get", object::get);
     }
 
-    fn register_tera_testers(&mut self) {
+    fn register_lysine_testers(&mut self) {
         self.register_tester("defined", testers::defined);
         self.register_tester("undefined", testers::undefined);
         self.register_tester("odd", testers::odd);
@@ -480,14 +478,14 @@ impl Lysine {
         self.register_tester("matching", testers::matching);
     }
 
-    fn register_tera_functions(&mut self) {
+    fn register_lysine_functions(&mut self) {
         self.register_function("range", functions::common::range);
         self.register_function("pick_random", functions::common::pick_random);
         
         self.register_function("now", functions::common::now);
         self.register_function("throw", functions::common::throw);
         
-        self.register_function("get_random", functions::common::get_random);
+        self.register_function("random_int", functions::common::random_int);
         self.register_function("get_env", functions::common::get_env);
     }
 
@@ -555,7 +553,7 @@ impl Lysine {
 
 impl Default for Lysine {
     fn default() -> Lysine {
-        let mut tera = Lysine {
+        let mut lysine = Lysine {
             glob: None,
             templates: HashMap::new(),
             filters: HashMap::new(),
@@ -565,10 +563,10 @@ impl Default for Lysine {
             escape_fn: escape_html,
         };
 
-        tera.register_tera_filters();
-        tera.register_tera_testers();
-        tera.register_tera_functions();
-        tera
+        lysine.register_lysine_filters();
+        lysine.register_lysine_testers();
+        lysine.register_lysine_functions();
+        lysine
     }
 }
 

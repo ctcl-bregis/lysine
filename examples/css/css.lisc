@@ -1,5 +1,0 @@
-{% for i in range(1, 6) %}
-h{{ i }} {
-    font-size: {{ i * 0.33 }}em;
-}
-{% endfor %}

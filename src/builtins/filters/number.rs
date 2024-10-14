@@ -1,7 +1,6 @@
 // Filters operating on numbers
 use std::collections::HashMap;
 
-
 use humansize::format_size;
 use serde_json::value::{to_value, Value};
 
@@ -81,5 +80,5 @@ pub fn filesizeformat(value: &Value, args: &HashMap<String, Value>) -> Result<Va
     };
     let format = if binary { humansize::BINARY } else { humansize::WINDOWS };
     Ok(to_value(format_size(num, format))
-        .expect("json serializing should always be possible for a string"))
+        .expect("JSON serialization should always be possible for a string"))
 }

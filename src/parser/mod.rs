@@ -8,6 +8,13 @@ use pest_derive::Parser;
 
 use crate::errors::{Error, Result as LysineResult};
 
+// The AST of Lysine
+pub mod ast;
+mod whitespace;
+
+use self::ast::*;
+pub use self::whitespace::remove_whitespace;
+
 // This include forces recompiling this source file if the grammar file changes.
 // Uncomment it when doing changes to the .pest file
 const _GRAMMAR: &str = include_str!("tera.pest");
@@ -16,13 +23,6 @@ const _GRAMMAR: &str = include_str!("tera.pest");
 #[grammar = "parser/tera.pest"]
 pub struct LysineParser;
 
-// The AST of Lysine
-pub mod ast;
-mod whitespace;
-
-
-use self::ast::*;
-pub use self::whitespace::remove_whitespace;
 
 lazy_static! {
     static ref MATH_PARSER: PrattParser<Rule> = PrattParser::new()
