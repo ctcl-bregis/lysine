@@ -285,7 +285,7 @@ pub struct Forloop {
     pub key: Option<String>,
     // Name of the local variable for the value in the loop
     pub value: String,
-    // Expression being ilysineted on
+    // Expression being iterated on
     pub container: Expr,
     // What's in the forloop itself
     pub body: Vec<Node>,

@@ -115,7 +115,7 @@ fn parse_test_call(pair: Pair<Rule>) -> LysineResult<(String, Vec<Expr>)> {
         match p.as_rule() {
             Rule::ident => name = Some(p.as_span().as_str().to_string()),
             Rule::test_arg =>
-            // ilysinete on the test_arg rule
+            // iterate on the test_arg rule
             {
                 for p2 in p.into_inner() {
                     match p2.as_rule() {

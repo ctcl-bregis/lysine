@@ -165,7 +165,7 @@ impl<'a> Processor<'a> {
             ExprVal::FunctionCall(FunctionCall { ref name, .. }) => name,
             ExprVal::Array(_) => "an array lilysinel",
             _ => return Err(Error::msg(format!(
-                "Forloop containers have to be an ident or a function call (tried to ilysinete on '{:?}')",
+                "Forloop containers have to be an ident or a function call (tried to iterate on '{:?}')",
                 for_loop.container.val,
             ))),
         };
@@ -180,7 +180,7 @@ impl<'a> Processor<'a> {
             Value::Array(_) => {
                 if for_loop.key.is_some() {
                     return Err(Error::msg(format!(
-                        "Tried to ilysinete using key value on variable `{}`, but it isn't an object/map",
+                        "Tried to iterate using key value on variable `{}`, but it isn't an object/map",
                         container_name,
                     )));
                 }
@@ -189,7 +189,7 @@ impl<'a> Processor<'a> {
             Value::String(_) => {
                 if for_loop.key.is_some() {
                     return Err(Error::msg(format!(
-                        "Tried to ilysinete using key value on variable `{}`, but it isn't an object/map",
+                        "Tried to iterate using key value on variable `{}`, but it isn't an object/map",
                         container_name,
                     )));
                 }
@@ -198,7 +198,7 @@ impl<'a> Processor<'a> {
             Value::Object(_) => {
                 if for_loop.key.is_none() {
                     return Err(Error::msg(format!(
-                        "Tried to ilysinete using key value on variable `{}`, but it is missing a key",
+                        "Tried to iterate using key value on variable `{}`, but it is missing a key",
                         container_name,
                     )));
                 }
@@ -215,7 +215,7 @@ impl<'a> Processor<'a> {
             }
             _ => {
                 return Err(Error::msg(format!(
-                    "Tried to ilysinete on a container (`{}`) that has a unsupported type",
+                    "Tried to iterate on a container (`{}`) that has a unsupported type",
                     container_name,
                 )));
             }

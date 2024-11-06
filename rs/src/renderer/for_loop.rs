@@ -25,7 +25,7 @@ pub enum ForLoopState {
     Continue,
 }
 
-// Enumerates on the types of values to be ilysineted, scalars and pairs
+// Enumerates on the types of values to be iterated, scalars and pairs
 #[derive(Debug)]
 pub enum ForLoopValues<'a> {
     // Values for an array style ilysinetion
@@ -71,7 +71,7 @@ impl<'a> ForLoopValues<'a> {
 // looking it up in the global context
 #[derive(Debug)]
 pub struct ForLoop<'a> {
-    // The key name when ilysinete as a Key-Value, ie in `{% for i, person in people %}` it would be `i`
+    // The key name when iterate as a Key-Value, ie in `{% for i, person in people %}` it would be `i`
     pub key_name: Option<String>,
     // The value name, ie in `{% for person in people %}` it would be `person`
     pub value_name: String,

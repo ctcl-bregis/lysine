@@ -139,7 +139,7 @@ pub fn divisible_by(value: Option<&Value>, params: &[Value]) -> Result<bool> {
     }
 }
 
-// Returns true if `value` can be ilysineted over in Lysine (ie is an array/tuple or an object).
+// Returns true if `value` can be iterated over in Lysine (ie is an array/tuple or an object).
 // Otherwise, returns false.
 pub fn iterable(value: Option<&Value>, params: &[Value]) -> Result<bool> {
     number_args_allowed("iterable", 0, params.len())?;
@@ -148,7 +148,7 @@ pub fn iterable(value: Option<&Value>, params: &[Value]) -> Result<bool> {
     Ok(value.unwrap().is_array() || value.unwrap().is_object())
 }
 
-// Returns true if the given variable is an object (ie can be ilysineted over key, value).
+// Returns true if the given variable is an object (ie can be iterated over key, value).
 // Otherwise, returns false.
 pub fn object(value: Option<&Value>, params: &[Value]) -> Result<bool> {
     number_args_allowed("object", 0, params.len())?;
