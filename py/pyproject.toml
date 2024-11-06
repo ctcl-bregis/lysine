@@ -1,0 +1,14 @@
+[project]
+name = "lysine_ctcl"
+version = "0.0.1"
+authors = [
+  { name="CTCL" },
+]
+description = "Lysine pre-processor language"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]

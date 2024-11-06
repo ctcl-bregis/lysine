@@ -1,4 +1,4 @@
-/// Filters operating on numbers
+// Filters operating on numbers
 use std::collections::HashMap;
 
 #[cfg(feature = "builtins")]
@@ -7,7 +7,7 @@ use serde_json::value::{to_value, Value};
 
 use crate::errors::{Error, Result};
 
-/// Returns the absolute value of the argument.
+// Returns the absolute value of the argument.
 pub fn abs(value: &Value, _: &HashMap<String, Value>) -> Result<Value> {
     if value.as_u64().is_some() {
         Ok(value.clone())
@@ -20,9 +20,9 @@ pub fn abs(value: &Value, _: &HashMap<String, Value>) -> Result<Value> {
     }
 }
 
-/// Returns a plural suffix if the value is not equal to ±1, or a singular
-/// suffix otherwise. The plural suffix defaults to `s` and the singular suffix
-/// defaults to the empty string (i.e nothing).
+// Returns a plural suffix if the value is not equal to ±1, or a singular
+// suffix otherwise. The plural suffix defaults to `s` and the singular suffix
+// defaults to the empty string (i.e nothing).
 pub fn pluralize(value: &Value, args: &HashMap<String, Value>) -> Result<Value> {
     let num = try_get_value!("pluralize", "value", f64, value);
 
@@ -44,10 +44,10 @@ pub fn pluralize(value: &Value, args: &HashMap<String, Value>) -> Result<Value> 
     }
 }
 
-/// Returns a rounded number using the `method` arg and `precision` given.
-/// `method` defaults to `common` which will round to the nearest number.
-/// `ceil` and `floor` are also available as method.
-/// `precision` defaults to `0`, meaning it will round to an integer
+// Returns a rounded number using the `method` arg and `precision` given.
+// `method` defaults to `common` which will round to the nearest number.
+// `ceil` and `floor` are also available as method.
+// `precision` defaults to `0`, meaning it will round to an integer
 pub fn round(value: &Value, args: &HashMap<String, Value>) -> Result<Value> {
     let num = try_get_value!("round", "value", f64, value);
     let method = match args.get("method") {
@@ -72,7 +72,7 @@ pub fn round(value: &Value, args: &HashMap<String, Value>) -> Result<Value> {
     }
 }
 
-/// Returns a human-readable file size (i.e. '110 MB') from an integer
+// Returns a human-readable file size (i.e. '110 MB') from an integer
 #[cfg(feature = "builtins")]
 pub fn filesizeformat(value: &Value, args: &HashMap<String, Value>) -> Result<Value> {
     let num = try_get_value!("filesizeformat", "value", usize, value);

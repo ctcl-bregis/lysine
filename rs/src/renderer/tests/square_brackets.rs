@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use crate::context::Context;
-use crate::tera::Tera;
+use crate::lysine::Lysine;
 use serde_derive::Serialize;
 
 #[derive(Serialize)]
@@ -45,7 +45,7 @@ fn var_access_by_square_brackets() {
     ];
 
     for (input, expected) in inputs {
-        let result = Tera::one_off(input, &context, true).unwrap();
+        let result = Lysine::one_off(input, &context, true).unwrap();
         println!("{:?} -> {:?} = {:?}", input, expected, result);
         assert_eq!(result, expected);
     }
@@ -55,15 +55,15 @@ fn var_access_by_square_brackets() {
 fn var_access_by_square_brackets_errors() {
     let mut context = Context::new();
     context.insert("var", &Test { a: "hi".into(), b: "there".into(), c: vec![] });
-    let t = Tera::one_off("{{var[csd]}}", &context, true);
+    let t = Lysine::one_off("{{var[csd]}}", &context, true);
     assert!(t.is_err(), "Access of csd should be impossible");
 }
 
-// https://github.com/Keats/tera/issues/334
+// https://github.com/Keats/lysine/issues/334
 #[test]
 fn var_access_by_loop_index() {
     let context = Context::new();
-    let res = Tera::one_off(
+    let res = Lysine::one_off(
         r#"
 {% set ics = ["fa-rocket","fa-paper-plane","fa-diamond","fa-signal"] %}
 {% for a in ics %}
@@ -76,11 +76,11 @@ fn var_access_by_loop_index() {
     assert!(res.is_ok());
 }
 
-// https://github.com/Keats/tera/issues/334
+// https://github.com/Keats/lysine/issues/334
 #[test]
 fn var_access_by_loop_index_with_set() {
     let context = Context::new();
-    let res = Tera::one_off(
+    let res = Lysine::one_off(
         r#"
 {% set ics = ["fa-rocket","fa-paper-plane","fa-diamond","fa-signal"] %}
 {% for a in ics %}
@@ -94,7 +94,7 @@ fn var_access_by_loop_index_with_set() {
     assert!(res.is_ok());
 }
 
-// https://github.com/Keats/tera/issues/754
+// https://github.com/Keats/lysine/issues/754
 #[test]
 fn can_get_value_if_key_contains_period() {
     let mut context = Context::new();
@@ -103,7 +103,7 @@ fn can_get_value_if_key_contains_period() {
     map.insert("Mt. Robson Provincial Park".to_string(), "hello".to_string());
     context.insert("tag_info", &map);
 
-    let res = Tera::one_off(r#"{{ tag_info[name] }}"#, &context, true);
+    let res = Lysine::one_off(r#"{{ tag_info[name] }}"#, &context, true);
     assert!(res.is_ok());
     let res = res.unwrap();
     assert_eq!(res, "hello");

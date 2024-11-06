@@ -4,46 +4,46 @@ use crate::errors::{Error, Result};
 use crate::parser::ast::{Block, MacroDefinition, Node};
 use crate::parser::{parse, remove_whitespace};
 
-/// This is the parsed equivalent of a template file.
-/// It also does some pre-processing to ensure it does as little as possible at runtime
-/// Not meant to be used directly.
+// This is the parsed equivalent of a template file.
+// It also does some pre-processing to ensure it does as little as possible at runtime
+// Not meant to be used directly.
 #[derive(Debug, Clone)]
 pub struct Template {
-    /// Name of the template, usually very similar to the path
+    // Name of the template, usually very similar to the path
     pub name: String,
-    /// Original path of the file. A template doesn't necessarily have
-    /// a file associated with it though so it's optional.
+    // Original path of the file. A template doesn't necessarily have
+    // a file associated with it though so it's optional.
     pub path: Option<String>,
-    /// Parsed AST, after whitespace removal
+    // Parsed AST, after whitespace removal
     pub ast: Vec<Node>,
-    /// Whether this template came from a call to `Tera::extend`, so we do
-    /// not remove it when we are doing a template reload
+    // Whether this template came from a call to `Lysine::extend`, so we do
+    // not remove it when we are doing a template reload
     pub from_extend: bool,
 
-    /// Macros defined in that file: name -> definition ast
+    // Macros defined in that file: name -> definition ast
     pub macros: HashMap<String, MacroDefinition>,
-    /// (filename, namespace) for the macros imported in that file
+    // (filename, namespace) for the macros imported in that file
     pub imported_macro_files: Vec<(String, String)>,
 
-    /// Only used during initial parsing. Rendering will use `self.parents`
+    // Only used during initial parsing. Rendering will use `self.parents`
     pub parent: Option<String>,
-    /// Only used during initial parsing. Rendering will use `self.blocks_definitions`
+    // Only used during initial parsing. Rendering will use `self.blocks_definitions`
     pub blocks: HashMap<String, Block>,
 
     // Below are filled when all templates have been parsed so we know the full hierarchy of templates
-    /// The full list of parent templates
+    // The full list of parent templates
     pub parents: Vec<String>,
-    /// The definition of all the blocks for the current template and the definition of those blocks
-    /// in parent templates if there are some.
-    /// Needed for super() to work without having to find them each time.
-    /// The type corresponds to the following `block_name -> [(template name, definition)]`
-    /// The order of the Vec is from the first in hierarchy to the current template and the template
-    /// name is needed in order to load its macros if necessary.
+    // The definition of all the blocks for the current template and the definition of those blocks
+    // in parent templates if there are some.
+    // Needed for super() to work without having to find them each time.
+    // The type corresponds to the following `block_name -> [(template name, definition)]`
+    // The order of the Vec is from the first in hierarchy to the current template and the template
+    // name is needed in order to load its macros if necessary.
     pub blocks_definitions: HashMap<String, Vec<(String, Block)>>,
 }
 
 impl Template {
-    /// Parse the template string given
+    // Parse the template string given
     pub fn new(tpl_name: &str, tpl_path: Option<String>, input: &str) -> Result<Template> {
         let ast = remove_whitespace(parse(input)?, None);
 

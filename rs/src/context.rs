@@ -4,83 +4,83 @@ use std::io::Write;
 use serde::ser::Serialize;
 use serde_json::value::{to_value, Map, Value};
 
-use crate::errors::{Error, Result as TeraResult};
+use crate::errors::{Error, Result as LysineResult};
 
-/// The struct that holds the context of a template rendering.
+// The struct that holds the context of a template rendering.
 ///
-/// Light wrapper around a `BTreeMap` for easier insertions of Serializable
-/// values
+// Light wrapper around a `BTreeMap` for easier insertions of Serializable
+// values
 #[derive(Debug, Clone, PartialEq)]
 pub struct Context {
     data: BTreeMap<String, Value>,
 }
 
 impl Context {
-    /// Initializes an empty context
+    // Initializes an empty context
     pub fn new() -> Self {
         Context { data: BTreeMap::new() }
     }
 
-    /// Converts the `val` parameter to `Value` and insert it into the context.
+    // Converts the `val` parameter to `Value` and insert it into the context.
     ///
-    /// Panics if the serialization fails.
+    // Panics if the serialization fails.
     ///
-    /// ```rust
-    /// # use tera::Context;
-    /// let mut context = tera::Context::new();
-    /// context.insert("number_users", &42);
-    /// ```
+    // ```rust
+    // # use lysine::Context;
+    // let mut context = lysine::Context::new();
+    // context.insert("number_users", &42);
+    // ```
     pub fn insert<T: Serialize + ?Sized, S: Into<String>>(&mut self, key: S, val: &T) {
         self.data.insert(key.into(), to_value(val).unwrap());
     }
 
-    /// Converts the `val` parameter to `Value` and insert it into the context.
+    // Converts the `val` parameter to `Value` and insert it into the context.
     ///
-    /// Returns an error if the serialization fails.
+    // Returns an error if the serialization fails.
     ///
-    /// ```rust
-    /// # use tera::Context;
-    /// # struct CannotBeSerialized;
-    /// # impl serde::Serialize for CannotBeSerialized {
-    /// #     fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
-    /// #         Err(serde::ser::Error::custom("Error"))
-    /// #     }
-    /// # }
-    /// # let user = CannotBeSerialized;
-    /// let mut context = Context::new();
-    /// // user is an instance of a struct implementing `Serialize`
-    /// if let Err(_) = context.try_insert("number_users", &user) {
-    ///     // Serialization failed
-    /// }
-    /// ```
+    // ```rust
+    // # use lysine::Context;
+    // # struct CannotBeSerialized;
+    // # impl serde::Serialize for CannotBeSerialized {
+    // #     fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+    // #         Err(serde::ser::Error::custom("Error"))
+    // #     }
+    // # }
+    // # let user = CannotBeSerialized;
+    // let mut context = Context::new();
+    // // user is an instance of a struct implementing `Serialize`
+    // if let Err(_) = context.try_insert("number_users", &user) {
+    //     // Serialization failed
+    // }
+    // ```
     pub fn try_insert<T: Serialize + ?Sized, S: Into<String>>(
         &mut self,
         key: S,
         val: &T,
-    ) -> TeraResult<()> {
+    ) -> LysineResult<()> {
         self.data.insert(key.into(), to_value(val)?);
 
         Ok(())
     }
 
-    /// Appends the data of the `source` parameter to `self`, overwriting existing keys.
-    /// The source context will be dropped.
+    // Appends the data of the `source` parameter to `self`, overwriting existing keys.
+    // The source context will be dropped.
     ///
-    /// ```rust
-    /// # use tera::Context;
-    /// let mut target = Context::new();
-    /// target.insert("a", &1);
-    /// target.insert("b", &2);
-    /// let mut source = Context::new();
-    /// source.insert("b", &3);
-    /// source.insert("d", &4);
-    /// target.extend(source);
-    /// ```
+    // ```rust
+    // # use lysine::Context;
+    // let mut target = Context::new();
+    // target.insert("a", &1);
+    // target.insert("b", &2);
+    // let mut source = Context::new();
+    // source.insert("b", &3);
+    // source.insert("d", &4);
+    // target.extend(source);
+    // ```
     pub fn extend(&mut self, mut source: Context) {
         self.data.append(&mut source.data);
     }
 
-    /// Converts the context to a `serde_json::Value` consuming the context.
+    // Converts the context to a `serde_json::Value` consuming the context.
     pub fn into_json(self) -> Value {
         let mut m = Map::new();
         for (key, value) in self.data {
@@ -89,8 +89,8 @@ impl Context {
         Value::Object(m)
     }
 
-    /// Takes a serde-json `Value` and convert it into a `Context` with no overhead/cloning.
-    pub fn from_value(obj: Value) -> TeraResult<Self> {
+    // Takes a serde-json `Value` and convert it into a `Context` with no overhead/cloning.
+    pub fn from_value(obj: Value) -> LysineResult<Self> {
         match obj {
             Value::Object(m) => {
                 let mut data = BTreeMap::new();
@@ -105,25 +105,25 @@ impl Context {
         }
     }
 
-    /// Takes something that impl Serialize and create a context with it.
-    /// Meant to be used if you have a hashmap or a struct and don't want to insert values
-    /// one by one in the context.
-    pub fn from_serialize(value: impl Serialize) -> TeraResult<Self> {
+    // Takes something that impl Serialize and create a context with it.
+    // Meant to be used if you have a hashmap or a struct and don't want to insert values
+    // one by one in the context.
+    pub fn from_serialize(value: impl Serialize) -> LysineResult<Self> {
         let obj = to_value(value).map_err(Error::json)?;
         Context::from_value(obj)
     }
 
-    /// Returns the value at a given key index.
+    // Returns the value at a given key index.
     pub fn get(&self, index: &str) -> Option<&Value> {
         self.data.get(index)
     }
 
-    /// Remove a key from the context, returning the value at the key if the key was previously inserted into the context.
+    // Remove a key from the context, returning the value at the key if the key was previously inserted into the context.
     pub fn remove(&mut self, index: &str) -> Option<Value> {
         self.data.remove(index)
     }
 
-    /// Checks if a value exists at a specific index.
+    // Checks if a value exists at a specific index.
     pub fn contains_key(&self, index: &str) -> bool {
         self.data.contains_key(index)
     }
@@ -216,7 +216,7 @@ impl ValueTruthy for Value {
     }
 }
 
-/// Converts a dotted path to a json pointer one
+// Converts a dotted path to a json pointer one
 #[inline]
 #[deprecated(
     since = "1.8.0",
@@ -225,7 +225,7 @@ impl ValueTruthy for Value {
 pub fn get_json_pointer(key: &str) -> String {
     lazy_static::lazy_static! {
         // Split the key into dot-separated segments, respecting quoted strings as single units
-        // to fix https://github.com/Keats/tera/issues/590
+        // to fix https://github.com/Keats/lysine/issues/590
         static ref JSON_POINTER_REGEX: regex::Regex = regex::Regex::new(r#""[^"]*"|[^.]+"#).unwrap();
     }
     let mut res = String::with_capacity(key.len() + 1);
@@ -241,7 +241,7 @@ pub fn get_json_pointer(key: &str) -> String {
     res
 }
 
-/// following iterator immitates regex::Regex::new(r#""[^"]*"|[^.\[\]]+"#) but also strips `"` and `'`
+// following Iterator immitates regex::Regex::new(r#""[^"]*"|[^.\[\]]+"#) but also strips `"` and `'`
 struct PointerMachina<'a> {
     pointer: &'a str,
     single_quoted: bool,
@@ -348,8 +348,8 @@ impl<'a> Iterator for PointerMachina<'a> {
     }
 }
 
-/// Lookups a dotted path in a json value
-/// contrary to the json slash pointer it's not allowed to begin with a dot
+// Lookups a dotted path in a json value
+// contrary to the json slash pointer it's not allowed to begin with a dot
 #[inline]
 #[must_use]
 pub fn dotted_pointer<'a>(value: &'a Value, pointer: &str) -> Option<&'a Value> {
@@ -367,7 +367,7 @@ pub fn dotted_pointer<'a>(value: &'a Value, pointer: &str) -> Option<&'a Value> 
     )
 }
 
-/// serde jsons parse_index
+// serde jsons parse_index
 #[inline]
 fn parse_index(s: &str) -> Option<usize> {
     if s.starts_with('+') || (s.starts_with('0') && s.len() != 1) {

@@ -8,12 +8,12 @@ use serde_json::value::{from_value, to_value, Value};
 
 use crate::errors::{Error, Result};
 
-/// The global function type definition
+// The global function type definition
 pub trait Function: Sync + Send {
-    /// The global function type definition
+    // The global function type definition
     fn call(&self, args: &HashMap<String, Value>) -> Result<Value>;
 
-    /// Whether the current function's output should be treated as safe, defaults to `false`
+    // Whether the current function's output should be treated as safe, defaults to `false`
     fn is_safe(&self) -> bool {
         false
     }

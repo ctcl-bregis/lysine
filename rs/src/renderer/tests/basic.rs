@@ -10,20 +10,20 @@ use serde_json::{json, Value};
 use crate::builtins::functions::Function;
 use crate::context::Context;
 use crate::errors::Result;
-use crate::tera::Tera;
+use crate::lysine::Lysine;
 
 use super::Review;
 
 fn render_template(content: &str, context: &Context) -> Result<String> {
-    let mut tera = Tera::default();
-    tera.add_raw_template("hello.html", content).unwrap();
-    tera.register_function("get_number", |_: &HashMap<String, Value>| Ok(Value::Number(10.into())));
-    tera.register_function("get_true", |_: &HashMap<String, Value>| Ok(Value::Bool(true)));
-    tera.register_function("get_string", |_: &HashMap<String, Value>| {
+    let mut lysine = Lysine::default();
+    lysine.add_raw_template("hello.html", content).unwrap();
+    lysine.register_function("get_number", |_: &HashMap<String, Value>| Ok(Value::Number(10.into())));
+    lysine.register_function("get_true", |_: &HashMap<String, Value>| Ok(Value::Bool(true)));
+    lysine.register_function("get_string", |_: &HashMap<String, Value>| {
         Ok(Value::String("Hello".to_string()))
     });
 
-    tera.render("hello.html", context)
+    lysine.render("hello.html", context)
 }
 
 #[test]
@@ -88,7 +88,7 @@ fn render_variable_block_ident() {
         ("{{ \" html \" | upper | trim }}", "HTML"),
         ("{{ 'html' }}", "html"),
         ("{{ `html` }}", "html"),
-        // https://github.com/Keats/tera/issues/273
+        // https://github.com/Keats/lysine/issues/273
         (
             r#"{{ 'hangar new "Will Smoth <will_s@example.com>"' | safe }}"#,
             r#"hangar new "Will Smoth <will_s@example.com>""#,
@@ -128,7 +128,7 @@ fn render_variable_block_ident() {
         ("{{ ( ( 2 ) + ( 2 ) ) }}", "4"),
         ("{{ ( ( 4 / 1 ) + ( 2 / 1 ) ) }}", "6"),
         ("{{ ( ( 4 + 2 ) / ( 2 + 1 ) ) }}", "2"),
-        // https://github.com/Keats/tera/issues/435
+        // https://github.com/Keats/lysine/issues/435
         (
             "{{ with_newline | replace(from='\n', to='<br>') | safe }}",
             "Animal Alphabets<br>B is for Bee-Eater",
@@ -212,9 +212,9 @@ fn render_variable_block_autoescaping_disabled() {
     ];
 
     for (input, expected) in inputs {
-        let mut tera = Tera::default();
-        tera.add_raw_template("hello.sql", input).unwrap();
-        assert_eq!(tera.render("hello.sql", &context).unwrap(), expected);
+        let mut lysine = Lysine::default();
+        lysine.add_raw_template("hello.sql", input).unwrap();
+        assert_eq!(lysine.render("hello.sql", &context).unwrap(), expected);
     }
 }
 
@@ -262,55 +262,55 @@ fn filter_args_are_not_escaped() {
 
 #[test]
 fn render_include_tag() {
-    let mut tera = Tera::default();
-    tera.add_raw_templates(vec![
+    let mut lysine = Lysine::default();
+    lysine.add_raw_templates(vec![
         ("world", "world"),
         ("hello", "<h1>Hello {% include \"world\" %}</h1>"),
     ])
     .unwrap();
-    let result = tera.render("hello", &Context::new()).unwrap();
+    let result = lysine.render("hello", &Context::new()).unwrap();
     assert_eq!(result, "<h1>Hello world</h1>".to_owned());
 }
 
 #[test]
 fn render_include_array_tag() {
-    let mut tera = Tera::default();
-    tera.add_raw_templates(vec![
+    let mut lysine = Lysine::default();
+    lysine.add_raw_templates(vec![
         ("world", "world"),
         ("hello", "<h1>Hello {% include [\"custom/world\", \"world\"] %}</h1>"),
     ])
     .unwrap();
-    let result = tera.render("hello", &Context::new()).unwrap();
+    let result = lysine.render("hello", &Context::new()).unwrap();
     assert_eq!(result, "<h1>Hello world</h1>".to_owned());
 
-    tera.add_raw_template("custom/world", "custom world").unwrap();
-    let result = tera.render("hello", &Context::new()).unwrap();
+    lysine.add_raw_template("custom/world", "custom world").unwrap();
+    let result = lysine.render("hello", &Context::new()).unwrap();
     assert_eq!(result, "<h1>Hello custom world</h1>".to_owned());
 }
 
 #[test]
 fn render_include_tag_missing() {
-    let mut tera = Tera::default();
-    tera.add_raw_template("hello", "<h1>Hello {% include \"world\" %}</h1>").unwrap();
-    let result = tera.render("hello", &Context::new());
+    let mut lysine = Lysine::default();
+    lysine.add_raw_template("hello", "<h1>Hello {% include \"world\" %}</h1>").unwrap();
+    let result = lysine.render("hello", &Context::new());
     assert!(result.is_err());
 
-    let mut tera = Tera::default();
-    tera.add_raw_template("hello", "<h1>Hello {% include \"world\" ignore missing %}</h1>")
+    let mut lysine = Lysine::default();
+    lysine.add_raw_template("hello", "<h1>Hello {% include \"world\" ignore missing %}</h1>")
         .unwrap();
-    let result = tera.render("hello", &Context::new()).unwrap();
+    let result = lysine.render("hello", &Context::new()).unwrap();
     assert_eq!(result, "<h1>Hello </h1>".to_owned());
 }
 
 #[test]
 fn can_set_variables_in_included_templates() {
-    let mut tera = Tera::default();
-    tera.add_raw_templates(vec![
+    let mut lysine = Lysine::default();
+    lysine.add_raw_templates(vec![
         ("world", r#"{% set a = "world" %}{{a}}"#),
         ("hello", "<h1>Hello {% include \"world\" %}</h1>"),
     ])
     .unwrap();
-    let result = tera.render("hello", &Context::new()).unwrap();
+    let result = lysine.render("hello", &Context::new()).unwrap();
     assert_eq!(result, "<h1>Hello world</h1>".to_owned());
 }
 
@@ -431,7 +431,7 @@ fn render_if_elif_else() {
         ("{% if is_true %}Admin{% endif %}", "Admin"),
         ("{% if is_true or age + 1 > 18 %}Adult{% endif %}", "Adult"),
         ("{% if is_true and age == 18 %}Adult{% endif %}", "Adult"),
-        // https://github.com/Keats/tera/issues/187
+        // https://github.com/Keats/lysine/issues/187
         ("{% if 1 <= 2 %}a{% endif %}", "a"),
         ("{% if 2 >= 1 %}a{% endif %}", "a"),
         ("{% if 1 < 2 %}a{% endif %}", "a"),
@@ -465,7 +465,7 @@ fn render_if_elif_else() {
         ("{% if is_true %}Admin{% elif is_false %}User{% else %}Hmm{% endif %}", "Admin"),
         ("{% if false %}Admin{% elif is_false %}User{% else %}Hmm{% endif %}", "Hmm"),
         // doesn't fallthrough elifs
-        // https://github.com/Keats/tera/issues/188
+        // https://github.com/Keats/lysine/issues/188
         ("{% if 1 < 4 %}a{% elif 2 < 4 %}b{% elif 3 < 4 %}c{% else %}d{% endif %}", "a"),
         // with in operator
         (
@@ -536,12 +536,12 @@ fn render_for() {
             "{% set looped = 0 %}{% for i in range(end=5) %}{% set looped = i %}{{looped}}{% endfor%}{{looped}}",
             "012340"
         ),
-        // https://github.com/Keats/tera/issues/184
+        // https://github.com/Keats/lysine/issues/184
         ("{% for note in notes %}{{ note }}{% endfor %}", "123"),
         ("{% for note in notes | reverse %}{{ note }}{% endfor %}", "321"),
         ("{% for v in vectors %}{{ v.0 }}{% endfor %}", "01"),
         // Loop control (`break` and `continue`)
-        // https://github.com/Keats/tera/issues/267
+        // https://github.com/Keats/lysine/issues/267
         (
             "{% for i in data %}{{ i }}{% if i == 2 %}{% break %}{% endif %}{% endfor %}",
             "12"
@@ -562,12 +562,12 @@ fn render_for() {
             "{% for a in [1, true, 1.1, 'hello'] %}{{a}}{% endfor %}",
             "1true1.1hello"
         ),
-        // https://github.com/Keats/tera/issues/301
+        // https://github.com/Keats/lysine/issues/301
         (
             "{% set start = 0 %}{% set end = start + 3 %}{% for i in range(start=start, end=end) %}{{ i }}{% endfor%}",
             "012"
         ),
-        // https://github.com/Keats/tera/issues/395
+        // https://github.com/Keats/lysine/issues/395
         (
             "{% for a in [] %}{{a}}{% else %}hello{% endfor %}",
             "hello"
@@ -593,7 +593,7 @@ fn render_magic_variable_isnt_escaped() {
     let mut context = Context::new();
     context.insert("html", &"<html>");
 
-    let result = render_template("{{ __tera_context }}", &context);
+    let result = render_template("{{ __lysine_context }}", &context);
 
     assert_eq!(
         result.unwrap(),
@@ -604,7 +604,7 @@ fn render_magic_variable_isnt_escaped() {
     );
 }
 
-// https://github.com/Keats/tera/issues/185
+// https://github.com/Keats/lysine/issues/185
 #[test]
 fn ok_many_variable_blocks() {
     let mut context = Context::new();
@@ -685,7 +685,7 @@ fn filter_filter_works() {
 }
 
 #[test]
-fn filter_on_array_literal_works() {
+fn filter_on_array_lilysinel_works() {
     let mut context = Context::new();
     let i: Option<usize> = None;
     context.insert("existing", "hello");
@@ -801,7 +801,7 @@ fn render_magic_variable_gets_all_contexts() {
     context.insert("i", &10);
 
     let result = render_template(
-        "{% set some_val = 1 %}{% for i in range(start=0, end=1) %}{% set for_val = i %}{{ __tera_context }}{% endfor %}",
+        "{% set some_val = 1 %}{% for i in range(start=0, end=1) %}{% set for_val = i %}{{ __lysine_context }}{% endfor %}",
         &context
     );
 
@@ -825,13 +825,13 @@ fn render_magic_variable_macro_doesnt_leak() {
     context.insert("num", &1);
     context.insert("i", &10);
 
-    let mut tera = Tera::default();
-    tera.add_raw_templates(vec![
-        ("macros", "{% macro hello(arg=1) %}{{ __tera_context }}{% endmacro hello %}"),
+    let mut lysine = Lysine::default();
+    lysine.add_raw_templates(vec![
+        ("macros", "{% macro hello(arg=1) %}{{ __lysine_context }}{% endmacro hello %}"),
         ("tpl", "{% import \"macros\" as macros %}{{macros::hello()}}"),
     ])
     .unwrap();
-    let result = tera.render("tpl", &context);
+    let result = lysine.render("tpl", &context);
 
     assert_eq!(
         result.unwrap(),
@@ -842,11 +842,11 @@ fn render_magic_variable_macro_doesnt_leak() {
     );
 }
 
-// https://github.com/Keats/tera/issues/342
+// https://github.com/Keats/lysine/issues/342
 #[test]
 fn redefining_loop_value_doesnt_break_loop() {
-    let mut tera = Tera::default();
-    tera.add_raw_template(
+    let mut lysine = Lysine::default();
+    lysine.add_raw_template(
         "tpl",
         r#"
 {%- set string = "abcdefghdijklm" | split(pat="d") -%}
@@ -858,15 +858,15 @@ fn redefining_loop_value_doesnt_break_loop() {
     )
     .unwrap();
     let context = Context::new();
-    let result = tera.render("tpl", &context);
+    let result = lysine.render("tpl", &context);
 
     assert_eq!(result.unwrap(), "abclol efghlol ijklmlol ");
 }
 
 #[test]
 fn can_use_concat_to_push_to_array() {
-    let mut tera = Tera::default();
-    tera.add_raw_template(
+    let mut lysine = Lysine::default();
+    lysine.add_raw_template(
         "tpl",
         r#"
 {%- set ids = [] -%}
@@ -877,7 +877,7 @@ fn can_use_concat_to_push_to_array() {
     )
     .unwrap();
     let context = Context::new();
-    let result = tera.render("tpl", &context);
+    let result = lysine.render("tpl", &context);
 
     assert_eq!(result.unwrap(), "[0, 1, 2, 3, 4]");
 }
@@ -905,47 +905,47 @@ lazy_static! {
 
 #[test]
 fn stateful_global_fn() {
-    fn make_tera() -> Tera {
-        let mut tera = Tera::default();
-        tera.add_raw_template(
+    fn make_lysine() -> Lysine {
+        let mut lysine = Lysine::default();
+        lysine.add_raw_template(
             "fn.html",
             "<h1>{{ get_next() }}, {{ get_next_shared() }}, {{ get_next() }}...</h1>",
         )
         .unwrap();
 
-        tera.register_function("get_next", Next(AtomicUsize::new(1)));
-        tera.register_function("get_next_shared", NEXT_GLOBAL.clone());
-        tera
+        lysine.register_function("get_next", Next(AtomicUsize::new(1)));
+        lysine.register_function("get_next_shared", NEXT_GLOBAL.clone());
+        lysine
     }
 
     assert_eq!(
-        make_tera().render("fn.html", &Context::new()).unwrap(),
+        make_lysine().render("fn.html", &Context::new()).unwrap(),
         "<h1>1, 1, 2...</h1>".to_owned()
     );
     assert_eq!(
-        make_tera().render("fn.html", &Context::new()).unwrap(),
+        make_lysine().render("fn.html", &Context::new()).unwrap(),
         "<h1>1, 2, 2...</h1>".to_owned()
     );
 }
 
-// https://github.com/Keats/tera/issues/373
+// https://github.com/Keats/lysine/issues/373
 #[test]
 fn split_on_context_value() {
-    let mut tera = Tera::default();
-    tera.add_raw_template("split.html", r#"{{ body | split(pat="\n") }}"#).unwrap();
+    let mut lysine = Lysine::default();
+    lysine.add_raw_template("split.html", r#"{{ body | split(pat="\n") }}"#).unwrap();
     let mut context = Context::new();
     context.insert("body", "multi\nple\nlines");
-    let res = tera.render("split.html", &context);
+    let res = lysine.render("split.html", &context);
     assert_eq!(res.unwrap(), "[multi, ple, lines]");
 }
 
-// https://github.com/Keats/tera/issues/422
+// https://github.com/Keats/lysine/issues/422
 #[test]
 fn default_filter_works_in_condition() {
-    let mut tera = Tera::default();
-    tera.add_raw_template("test.html", r#"{% if frobnicate|default(value=True) %}here{% endif %}"#)
+    let mut lysine = Lysine::default();
+    lysine.add_raw_template("test.html", r#"{% if frobnicate|default(value=True) %}here{% endif %}"#)
         .unwrap();
-    let res = tera.render("test.html", &Context::new());
+    let res = lysine.render("test.html", &Context::new());
     assert_eq!(res.unwrap(), "here");
 }
 
@@ -962,11 +962,11 @@ fn safe_filter_works() {
         }
     }
 
-    let mut tera = Tera::default();
-    tera.register_filter("safe_filter", Safe);
-    tera.add_raw_template("test.html", r#"{{ "Hello" | safe_filter }}"#).unwrap();
+    let mut lysine = Lysine::default();
+    lysine.register_filter("safe_filter", Safe);
+    lysine.add_raw_template("test.html", r#"{{ "Hello" | safe_filter }}"#).unwrap();
 
-    let res = tera.render("test.html", &Context::new());
+    let res = lysine.render("test.html", &Context::new());
     assert_eq!(res.unwrap(), "<div>Hello</div>");
 }
 
@@ -983,10 +983,10 @@ fn safe_function_works() {
         }
     }
 
-    let mut tera = Tera::default();
-    tera.register_function("safe_function", Safe);
-    tera.add_raw_template("test.html", "{{ safe_function() }}").unwrap();
+    let mut lysine = Lysine::default();
+    lysine.register_function("safe_function", Safe);
+    lysine.add_raw_template("test.html", "{{ safe_function() }}").unwrap();
 
-    let res = tera.render("test.html", &Context::new());
+    let res = lysine.render("test.html", &Context::new());
     assert_eq!(res.unwrap(), "<div>Hello</div>");
 }

@@ -1,11 +1,11 @@
-/// Filters operating on numbers
+// Filters operating on numbers
 use std::collections::HashMap;
 
 use serde_json::value::Value;
 
 use crate::errors::{Error, Result};
 
-/// Returns a value by a `key` argument from a given object
+// Returns a value by a `key` argument from a given object
 pub fn get(value: &Value, args: &HashMap<String, Value>) -> Result<Value> {
     let default = args.get("default");
     let key = match args.get("key") {

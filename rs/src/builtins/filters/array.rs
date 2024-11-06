@@ -1,4 +1,4 @@
-/// Filters operating on array
+// Filters operating on array
 use std::collections::HashMap;
 
 use crate::context::{dotted_pointer, ValueRender};
@@ -7,8 +7,8 @@ use crate::filter_utils::{get_sort_strategy_for_type, get_unique_strategy_for_ty
 use crate::utils::render_to_string;
 use serde_json::value::{to_value, Map, Value};
 
-/// Returns the nth value of an array
-/// If the array is empty, returns empty string
+// Returns the nth value of an array
+// If the array is empty, returns empty string
 pub fn nth(value: &Value, args: &HashMap<String, Value>) -> Result<Value> {
     let arr = try_get_value!("nth", "value", Vec<Value>, value);
 
@@ -24,8 +24,8 @@ pub fn nth(value: &Value, args: &HashMap<String, Value>) -> Result<Value> {
     Ok(arr.get(index).unwrap_or(&to_value("").unwrap()).to_owned())
 }
 
-/// Returns the first value of an array
-/// If the array is empty, returns empty string
+// Returns the first value of an array
+// If the array is empty, returns empty string
 pub fn first(value: &Value, _: &HashMap<String, Value>) -> Result<Value> {
     let mut arr = try_get_value!("first", "value", Vec<Value>, value);
 
@@ -36,17 +36,17 @@ pub fn first(value: &Value, _: &HashMap<String, Value>) -> Result<Value> {
     }
 }
 
-/// Returns the last value of an array
-/// If the array is empty, returns empty string
+// Returns the last value of an array
+// If the array is empty, returns empty string
 pub fn last(value: &Value, _: &HashMap<String, Value>) -> Result<Value> {
     let mut arr = try_get_value!("last", "value", Vec<Value>, value);
 
     Ok(arr.pop().unwrap_or_else(|| to_value("").unwrap()))
 }
 
-/// Joins all values in the array by the `sep` argument given
-/// If no separator is given, it will use `""` (empty string) as separator
-/// If the array is empty, returns empty string
+// Joins all values in the array by the `sep` argument given
+// If no separator is given, it will use `""` (empty string) as separator
+// If the array is empty, returns empty string
 pub fn join(value: &Value, args: &HashMap<String, Value>) -> Result<Value> {
     let arr = try_get_value!("join", "value", Vec<Value>, value);
     let sep = match args.get("sep") {
@@ -68,8 +68,8 @@ pub fn join(value: &Value, args: &HashMap<String, Value>) -> Result<Value> {
     to_value(rendered.join(&sep)).map_err(Error::json)
 }
 
-/// Sorts the array in ascending order.
-/// Use the 'attribute' argument to define a field to sort by.
+// Sorts the array in ascending order.
+// Use the 'attribute' argument to define a field to sort by.
 pub fn sort(value: &Value, args: &HashMap<String, Value>) -> Result<Value> {
     let arr = try_get_value!("sort", "value", Vec<Value>, value);
     if arr.is_empty() {
@@ -97,9 +97,9 @@ pub fn sort(value: &Value, args: &HashMap<String, Value>) -> Result<Value> {
     Ok(sorted.into())
 }
 
-/// Remove duplicates from an array.
-/// Use the 'attribute' argument to define a field to filter on.
-/// For strings, use the 'case_sensitive' argument (defaults to false) to control the comparison.
+// Remove duplicates from an array.
+// Use the 'attribute' argument to define a field to filter on.
+// For strings, use the 'case_sensitive' argument (defaults to false) to control the comparison.
 pub fn unique(value: &Value, args: &HashMap<String, Value>) -> Result<Value> {
     let arr = try_get_value!("unique", "value", Vec<Value>, value);
     if arr.is_empty() {
@@ -144,9 +144,9 @@ pub fn unique(value: &Value, args: &HashMap<String, Value>) -> Result<Value> {
     Ok(to_value(arr?).unwrap())
 }
 
-/// Group the array values by the `attribute` given
-/// Returns a hashmap of key => values, items without the `attribute` or where `attribute` is `null` are discarded.
-/// The returned keys are stringified
+// Group the array values by the `attribute` given
+// Returns a hashmap of key => values, items without the `attribute` or where `attribute` is `null` are discarded.
+// The returned keys are stringified
 pub fn group_by(value: &Value, args: &HashMap<String, Value>) -> Result<Value> {
     let arr = try_get_value!("group_by", "value", Vec<Value>, value);
     if arr.is_empty() {
@@ -185,9 +185,9 @@ pub fn group_by(value: &Value, args: &HashMap<String, Value>) -> Result<Value> {
     Ok(to_value(grouped).unwrap())
 }
 
-/// Filter the array values, returning only the values where the `attribute` is equal to the `value`
-/// Values without the `attribute` or with a null `attribute` are discarded
-/// If the `value` is not passed, discard all elements where the attribute is null.
+// Filter the array values, returning only the values where the `attribute` is equal to the `value`
+// Values without the `attribute` or with a null `attribute` are discarded
+// If the `value` is not passed, discard all elements where the attribute is null.
 pub fn filter(value: &Value, args: &HashMap<String, Value>) -> Result<Value> {
     let mut arr = try_get_value!("filter", "value", Vec<Value>, value);
     if arr.is_empty() {
@@ -215,8 +215,8 @@ pub fn filter(value: &Value, args: &HashMap<String, Value>) -> Result<Value> {
     Ok(to_value(arr).unwrap())
 }
 
-/// Map retrieves an attribute from a list of objects.
-/// The 'attribute' argument specifies what to retrieve.
+// Map retrieves an attribute from a list of objects.
+// The 'attribute' argument specifies what to retrieve.
 pub fn map(value: &Value, args: &HashMap<String, Value>) -> Result<Value> {
     let arr = try_get_value!("map", "value", Vec<Value>, value);
     if arr.is_empty() {
@@ -248,10 +248,10 @@ fn get_index(i: f64, array: &[Value]) -> usize {
     }
 }
 
-/// Slice the array
-/// Use the `start` argument to define where to start (inclusive, default to `0`)
-/// and `end` argument to define where to stop (exclusive, default to the length of the array)
-/// `start` and `end` are 0-indexed
+// Slice the array
+// Use the `start` argument to define where to start (inclusive, default to `0`)
+// and `end` argument to define where to stop (exclusive, default to the length of the array)
+// `start` and `end` are 0-indexed
 pub fn slice(value: &Value, args: &HashMap<String, Value>) -> Result<Value> {
     let arr = try_get_value!("slice", "value", Vec<Value>, value);
     if arr.is_empty() {
@@ -280,8 +280,8 @@ pub fn slice(value: &Value, args: &HashMap<String, Value>) -> Result<Value> {
     Ok(arr[start..end].into())
 }
 
-/// Concat the array with another one if the `with` parameter is an array or
-/// just append it otherwise
+// Concat the array with another one if the `with` parameter is an array or
+// just append it otherwise
 pub fn concat(value: &Value, args: &HashMap<String, Value>) -> Result<Value> {
     let mut arr = try_get_value!("concat", "value", Vec<Value>, value);
 

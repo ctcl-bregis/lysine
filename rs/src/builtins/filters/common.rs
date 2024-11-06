@@ -1,4 +1,4 @@
-/// Filters operating on multiple types
+// Filters operating on multiple types
 use std::collections::HashMap;
 #[cfg(feature = "date-locale")]
 use std::convert::TryFrom;
@@ -59,14 +59,14 @@ pub fn json_encode(value: &Value, args: &HashMap<String, Value>) -> Result<Value
     }
 }
 
-/// Returns a formatted time according to the given `format` argument.
-/// `format` defaults to the ISO 8601 `YYYY-MM-DD` format.
+// Returns a formatted time according to the given `format` argument.
+// `format` defaults to the ISO 8601 `YYYY-MM-DD` format.
 ///
-/// Input can be an i64 timestamp (seconds since epoch) or an RFC3339 string
-/// (default serialization format for `chrono::DateTime`).
+// Input can be an i64 timestamp (seconds since epoch) or an RFC3339 string
+// (default serialization format for `chrono::DateTime`).
 ///
-/// a full reference for the time formatting syntax is available
-/// on [chrono docs](https://lifthrasiir.github.io/rust-chrono/chrono/format/strftime/index.html)
+// a full reference for the time formatting syntax is available
+// on [chrono docs](https://lifthrasiir.github.io/rust-chrono/chrono/format/strftime/index.html)
 #[cfg(feature = "builtins")]
 pub fn date(value: &Value, args: &HashMap<String, Value>) -> Result<Value> {
     let format = match args.get("format") {

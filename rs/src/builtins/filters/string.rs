@@ -1,4 +1,4 @@
-/// Filters operating on string
+// Filters operating on string
 use std::collections::HashMap;
 use std::io::Read;
 use std::ops::Index;
@@ -14,16 +14,16 @@ use percent_encoding::{percent_encode, AsciiSet, NON_ALPHANUMERIC};
 use crate::errors::{Error, Result};
 use crate::utils;
 
-/// https://url.spec.whatwg.org/#fragment-percent-encode-set
+// https://url.spec.whatwg.org/#fragment-percent-encode-set
 #[cfg(feature = "urlencode")]
 const FRAGMENT_ENCODE_SET: &AsciiSet =
     &percent_encoding::CONTROLS.add(b' ').add(b'"').add(b'<').add(b'>').add(b'`');
 
-/// https://url.spec.whatwg.org/#path-percent-encode-set
+// https://url.spec.whatwg.org/#path-percent-encode-set
 #[cfg(feature = "urlencode")]
 const PATH_ENCODE_SET: &AsciiSet = &FRAGMENT_ENCODE_SET.add(b'#').add(b'?').add(b'{').add(b'}');
 
-/// https://url.spec.whatwg.org/#userinfo-percent-encode-set
+// https://url.spec.whatwg.org/#userinfo-percent-encode-set
 #[cfg(feature = "urlencode")]
 const USERINFO_ENCODE_SET: &AsciiSet = &PATH_ENCODE_SET
     .add(b'/')
@@ -37,9 +37,9 @@ const USERINFO_ENCODE_SET: &AsciiSet = &PATH_ENCODE_SET
     .add(b'^')
     .add(b'|');
 
-/// Same as Python quote
-/// https://github.com/python/cpython/blob/da27d9b9dc44913ffee8f28d9638985eaaa03755/Lib/urllib/parse.py#L787
-/// with `/` not escaped
+// Same as Python quote
+// https://github.com/python/cpython/blob/da27d9b9dc44913ffee8f28d9638985eaaa03755/Lib/urllib/parse.py#L787
+// with `/` not escaped
 #[cfg(feature = "urlencode")]
 const PYTHON_ENCODE_SET: &AsciiSet = &USERINFO_ENCODE_SET
     .remove(b'/')
@@ -67,42 +67,42 @@ lazy_static! {
     static ref SPACELESS_RE: Regex = Regex::new(r">\s+<").unwrap();
 }
 
-/// Convert a value to uppercase.
+// Convert a value to uppercase.
 pub fn upper(value: &Value, _: &HashMap<String, Value>) -> Result<Value> {
     let s = try_get_value!("upper", "value", String, value);
 
     Ok(to_value(s.to_uppercase()).unwrap())
 }
 
-/// Convert a value to lowercase.
+// Convert a value to lowercase.
 pub fn lower(value: &Value, _: &HashMap<String, Value>) -> Result<Value> {
     let s = try_get_value!("lower", "value", String, value);
 
     Ok(to_value(s.to_lowercase()).unwrap())
 }
 
-/// Strip leading and trailing whitespace.
+// Strip leading and trailing whitespace.
 pub fn trim(value: &Value, _: &HashMap<String, Value>) -> Result<Value> {
     let s = try_get_value!("trim", "value", String, value);
 
     Ok(to_value(s.trim()).unwrap())
 }
 
-/// Strip leading whitespace.
+// Strip leading whitespace.
 pub fn trim_start(value: &Value, _: &HashMap<String, Value>) -> Result<Value> {
     let s = try_get_value!("trim_start", "value", String, value);
 
     Ok(to_value(s.trim_start()).unwrap())
 }
 
-/// Strip trailing whitespace.
+// Strip trailing whitespace.
 pub fn trim_end(value: &Value, _: &HashMap<String, Value>) -> Result<Value> {
     let s = try_get_value!("trim_end", "value", String, value);
 
     Ok(to_value(s.trim_end()).unwrap())
 }
 
-/// Strip leading characters that match the given pattern.
+// Strip leading characters that match the given pattern.
 pub fn trim_start_matches(value: &Value, args: &HashMap<String, Value>) -> Result<Value> {
     let s = try_get_value!("trim_start_matches", "value", String, value);
 
@@ -120,7 +120,7 @@ pub fn trim_start_matches(value: &Value, args: &HashMap<String, Value>) -> Resul
     Ok(to_value(s.trim_start_matches(&pat)).unwrap())
 }
 
-/// Strip trailing characters that match the given pattern.
+// Strip trailing characters that match the given pattern.
 pub fn trim_end_matches(value: &Value, args: &HashMap<String, Value>) -> Result<Value> {
     let s = try_get_value!("trim_end_matches", "value", String, value);
 
@@ -138,23 +138,23 @@ pub fn trim_end_matches(value: &Value, args: &HashMap<String, Value>) -> Result<
     Ok(to_value(s.trim_end_matches(&pat)).unwrap())
 }
 
-/// Truncates a string to the indicated length.
+// Truncates a string to the indicated length.
 ///
-/// # Arguments
+// # Arguments
 ///
-/// * `value`   - The string that needs to be truncated.
-/// * `args`    - A set of key/value arguments that can take the following
-///   keys.
-/// * `length`  - The length at which the string needs to be truncated. If
-///   the length is larger than the length of the string, the string is
-///   returned untouched. The default value is 255.
-/// * `end`     - The ellipsis string to be used if the given string is
-///   truncated. The default value is "…".
+// * `value`   - The string that needs to be truncated.
+// * `args`    - A set of key/value arguments that can take the following
+//   keys.
+// * `length`  - The length at which the string needs to be truncated. If
+//   the length is larger than the length of the string, the string is
+//   returned untouched. The default value is 255.
+// * `end`     - The ellipsis string to be used if the given string is
+//   truncated. The default value is "…".
 ///
-/// # Remarks
+// # Remarks
 ///
-/// The return value of this function might be longer than `length`: the `end`
-/// string is *added* after the truncation occurs.
+// The return value of this function might be longer than `length`: the `end`
+// string is *added* after the truncation occurs.
 ///
 pub fn truncate(value: &Value, args: &HashMap<String, Value>) -> Result<Value> {
     let s = try_get_value!("truncate", "value", String, value);
@@ -178,14 +178,14 @@ pub fn truncate(value: &Value, args: &HashMap<String, Value>) -> Result<Value> {
     Ok(to_value(result).unwrap())
 }
 
-/// Gets the number of words in a string.
+// Gets the number of words in a string.
 pub fn wordcount(value: &Value, _: &HashMap<String, Value>) -> Result<Value> {
     let s = try_get_value!("wordcount", "value", String, value);
 
     Ok(to_value(s.split_whitespace().count()).unwrap())
 }
 
-/// Replaces given `from` substring with `to` string.
+// Replaces given `from` substring with `to` string.
 pub fn replace(value: &Value, args: &HashMap<String, Value>) -> Result<Value> {
     let s = try_get_value!("replace", "value", String, value);
 
@@ -202,7 +202,7 @@ pub fn replace(value: &Value, args: &HashMap<String, Value>) -> Result<Value> {
     Ok(to_value(s.replace(&from, &to)).unwrap())
 }
 
-/// First letter of the string is uppercase rest is lowercase
+// First letter of the string is uppercase rest is lowercase
 pub fn capitalize(value: &Value, _: &HashMap<String, Value>) -> Result<Value> {
     let s = try_get_value!("capitalize", "value", String, value);
     let mut chars = s.chars();
@@ -215,7 +215,7 @@ pub fn capitalize(value: &Value, _: &HashMap<String, Value>) -> Result<Value> {
     }
 }
 
-/// Percent-encodes reserved URI characters
+// Percent-encodes reserved URI characters
 #[cfg(feature = "urlencode")]
 pub fn urlencode(value: &Value, _: &HashMap<String, Value>) -> Result<Value> {
     let s = try_get_value!("urlencode", "value", String, value);
@@ -223,7 +223,7 @@ pub fn urlencode(value: &Value, _: &HashMap<String, Value>) -> Result<Value> {
     Ok(Value::String(encoded))
 }
 
-/// Percent-encodes all non-alphanumeric characters
+// Percent-encodes all non-alphanumeric characters
 #[cfg(feature = "urlencode")]
 pub fn urlencode_strict(value: &Value, _: &HashMap<String, Value>) -> Result<Value> {
     let s = try_get_value!("urlencode_strict", "value", String, value);
@@ -231,13 +231,13 @@ pub fn urlencode_strict(value: &Value, _: &HashMap<String, Value>) -> Result<Val
     Ok(Value::String(encoded))
 }
 
-/// Escapes quote characters
+// Escapes quote characters
 pub fn addslashes(value: &Value, _: &HashMap<String, Value>) -> Result<Value> {
     let s = try_get_value!("addslashes", "value", String, value);
     Ok(to_value(s.replace('\\', "\\\\").replace('\"', "\\\"").replace('\'', "\\\'")).unwrap())
 }
 
-/// Capitalizes each word in the string
+// Capitalizes each word in the string
 pub fn title(value: &Value, _: &HashMap<String, Value>) -> Result<Value> {
     let s = try_get_value!("title", "value", String, value);
 
@@ -249,24 +249,24 @@ pub fn title(value: &Value, _: &HashMap<String, Value>) -> Result<Value> {
     .unwrap())
 }
 
-/// Convert line breaks (`\n` or `\r\n`) to HTML linebreaks (`<br>`).
+// Convert line breaks (`\n` or `\r\n`) to HTML linebreaks (`<br>`).
 ///
-/// Example: The input "Hello\nWorld" turns into "Hello<br>World".
+// Example: The input "Hello\nWorld" turns into "Hello<br>World".
 pub fn linebreaksbr(value: &Value, _: &HashMap<String, Value>) -> Result<Value> {
     let s = try_get_value!("linebreaksbr", "value", String, value);
     Ok(to_value(s.replace("\r\n", "<br>").replace('\n', "<br>")).unwrap())
 }
 
-/// Indents a string by the specified width.
+// Indents a string by the specified width.
 ///
-/// # Arguments
+// # Arguments
 ///
-/// * `value`   - The string to indent.
-/// * `args`    - A set of key/value arguments that can take the following
-///   keys.
-/// * `prefix`  - The prefix used for indentation. The default value is 4 spaces.
-/// * `first`  - True indents the first line.  The default is false.
-/// * `blank`  - True indents blank lines.  The default is false.
+// * `value`   - The string to indent.
+// * `args`    - A set of key/value arguments that can take the following
+//   keys.
+// * `prefix`  - The prefix used for indentation. The default value is 4 spaces.
+// * `first`  - True indents the first line.  The default is false.
+// * `blank`  - True indents blank lines.  The default is false.
 ///
 pub fn indent(value: &Value, args: &HashMap<String, Value>) -> Result<Value> {
     let s = try_get_value!("indent", "value", String, value);
@@ -308,26 +308,26 @@ pub fn indent(value: &Value, args: &HashMap<String, Value>) -> Result<Value> {
     Ok(to_value(&out).unwrap())
 }
 
-/// Removes html tags from string
+// Removes html tags from string
 pub fn striptags(value: &Value, _: &HashMap<String, Value>) -> Result<Value> {
     let s = try_get_value!("striptags", "value", String, value);
     Ok(to_value(STRIPTAGS_RE.replace_all(&s, "")).unwrap())
 }
 
-/// Removes spaces between html tags from string
+// Removes spaces between html tags from string
 pub fn spaceless(value: &Value, _: &HashMap<String, Value>) -> Result<Value> {
     let s = try_get_value!("spaceless", "value", String, value);
     Ok(to_value(SPACELESS_RE.replace_all(&s, "><")).unwrap())
 }
 
-/// Returns the given text with all special HTML characters encoded
+// Returns the given text with all special HTML characters encoded
 pub fn escape_html(value: &Value, _: &HashMap<String, Value>) -> Result<Value> {
     let s = try_get_value!("escape_html", "value", String, value);
     Ok(Value::String(utils::escape_html(&s)))
 }
 
-/// Returns the given text with all special XML characters encoded
-/// Very similar to `escape_html`, just a few characters less are encoded
+// Returns the given text with all special XML characters encoded
+// Very similar to `escape_html`, just a few characters less are encoded
 pub fn escape_xml(value: &Value, _: &HashMap<String, Value>) -> Result<Value> {
     let s = try_get_value!("escape_html", "value", String, value);
 
@@ -345,7 +345,7 @@ pub fn escape_xml(value: &Value, _: &HashMap<String, Value>) -> Result<Value> {
     Ok(Value::String(output))
 }
 
-/// Split the given string by the given pattern.
+// Split the given string by the given pattern.
 pub fn split(value: &Value, args: &HashMap<String, Value>) -> Result<Value> {
     let s = try_get_value!("split", "value", String, value);
 
@@ -363,7 +363,7 @@ pub fn split(value: &Value, args: &HashMap<String, Value>) -> Result<Value> {
     Ok(to_value(s.split(&pat).collect::<Vec<_>>()).unwrap())
 }
 
-/// Convert the value to a signed integer number
+// Convert the value to a signed integer number
 pub fn int(value: &Value, args: &HashMap<String, Value>) -> Result<Value> {
     let default = match args.get("default") {
         Some(d) => try_get_value!("int", "default", i64, d),
@@ -411,7 +411,7 @@ pub fn int(value: &Value, args: &HashMap<String, Value>) -> Result<Value> {
     Ok(to_value(v).unwrap())
 }
 
-/// Convert the value to a floating point number
+// Convert the value to a floating point number
 pub fn float(value: &Value, args: &HashMap<String, Value>) -> Result<Value> {
     let default = match args.get("default") {
         Some(d) => try_get_value!("float", "default", f64, d),
@@ -592,7 +592,7 @@ mod tests {
         assert_eq!(result.unwrap(), to_value("Goodbye world!").unwrap());
     }
 
-    // https://github.com/Keats/tera/issues/435
+    // https://github.com/Keats/lysine/issues/435
     #[test]
     fn test_replace_newline() {
         let mut args = HashMap::new();

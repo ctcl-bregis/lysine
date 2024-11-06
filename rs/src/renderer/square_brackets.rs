@@ -1,5 +1,5 @@
-/// Return a Vec of all substrings contained in '[ ]'s
-/// Ignore quoted strings and integers.
+// Return a Vec of all substrings contained in '[ ]'s
+// Ignore quoted strings and integers.
 pub fn pull_out_square_bracket(s: &str) -> Vec<String> {
     let mut chars = s.chars();
     let mut results = vec![];

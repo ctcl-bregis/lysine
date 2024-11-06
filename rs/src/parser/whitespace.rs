@@ -20,13 +20,13 @@ macro_rules! trim_right_previous {
     };
 }
 
-/// Removes whitespace from the AST nodes according to the `{%-` and `-%}` defined in the template.
-/// Empty string nodes will be discarded.
+// Removes whitespace from the AST nodes according to the `{%-` and `-%}` defined in the template.
+// Empty string nodes will be discarded.
 ///
-/// The `ws` param is used when recursing through nested bodies to know whether to know
-/// how to handle the whitespace for that whole body:
-/// - set the initial `trim_left_next` to `ws.left`
-/// - trim last node if it is a text node if `ws.right == true`
+// The `ws` param is used when recursing through nested bodies to know whether to know
+// how to handle the whitespace for that whole body:
+// - set the initial `trim_left_next` to `ws.left`
+// - trim last node if it is a text node if `ws.right == true`
 pub fn remove_whitespace(nodes: Vec<Node>, body_ws: Option<WS>) -> Vec<Node> {
     let mut res = Vec::with_capacity(nodes.len());
 
@@ -130,7 +130,7 @@ pub fn remove_whitespace(nodes: Vec<Node>, body_ws: Option<WS>) -> Vec<Node> {
                     }
 
                     // we can't peek at the next one to know whether we need to trim right since
-                    // are consuming conditions. We'll find out at the next iteration.
+                    // are consuming conditions. We'll find out at the next ilysinetion.
                     condition.2 = remove_whitespace(
                         condition.2,
                         Some(WS { left: condition.0.right, right: false }),
