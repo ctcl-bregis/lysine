@@ -360,10 +360,10 @@ fn parent_macro_cant_access_child_macro_context() {
     let mut lysine = Lysine::default();
     lysine.add_raw_templates(vec![
         ("parent", "{% import \"macros\" as macros %}{{ macros::test_global() }}"),
-        ("macros", r#"{% import "moremacros" as moremacros %}{% macro test_global() %}{% set_global value1 = "ACAB" %}{{ moremacros::another_one() }}{{ value1 }}-{{ value2 | default(value="ACAB") }}{% endmacro test_global %}"#),
-        ("moremacros", r#"{% macro another_one() %}{% set_global value2 = "1312" %}{% endmacro another_one %}"#)
+        ("macros", r#"{% import "moremacros" as moremacros %}{% macro test_global() %}{% set_global value1 = "macro" %}{{ moremacros::another_one() }}{{ value1 }}-{{ value2 | default(value="macro") }}{% endmacro test_global %}"#),
+        ("moremacros", r#"{% macro another_one() %}{% set_global value2 = "1234" %}{% endmacro another_one %}"#)
     ]).unwrap();
 
     let result = lysine.render("parent", &Context::new());
-    assert_eq!(result.unwrap(), "ACAB-ACAB".to_string());
+    assert_eq!(result.unwrap(), "macro-macro".to_string());
 }

@@ -1,4 +1,4 @@
-<img src="lysine.svg" style="width: 25%" alt="Lysine"/>
+<img src="lysine_20241108.png" style="width: 25%; image-rendering: crisp-edges;" alt="Lysine"/>
 
 # Lysine
 Lysine is a preprocessor/templating scripting language for webpages.
