@@ -7,5 +7,12 @@ This repository currently contains compilier implementations for the following:
 * Rust
 * Python
 
+The two current language implementations are forks of existing compiliers in order to be able to use Lysine in projects quickly.
+
+In the future, rewrites may be done to have all original code.
+
 ## Rust
-The Rust version of the compilier is a fork of Tera with many modifications.
+The Rust version of the compilier is currently a fork of Tera with some modifications.
+
+## Python
+The Python version of the compilier is currently a fork of Jinja2 with some modifications.

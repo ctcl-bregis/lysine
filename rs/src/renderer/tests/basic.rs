@@ -88,7 +88,7 @@ fn render_variable_block_ident() {
         ("{{ \" html \" | upper | trim }}", "HTML"),
         ("{{ 'html' }}", "html"),
         ("{{ `html` }}", "html"),
-        // https://github.com/Keats/lysine/issues/273
+        // https://github.com/Keats/tera/issues/273
         (
             r#"{{ 'hangar new "Will Smoth <will_s@example.com>"' | safe }}"#,
             r#"hangar new "Will Smoth <will_s@example.com>""#,
@@ -128,7 +128,7 @@ fn render_variable_block_ident() {
         ("{{ ( ( 2 ) + ( 2 ) ) }}", "4"),
         ("{{ ( ( 4 / 1 ) + ( 2 / 1 ) ) }}", "6"),
         ("{{ ( ( 4 + 2 ) / ( 2 + 1 ) ) }}", "2"),
-        // https://github.com/Keats/lysine/issues/435
+        // https://github.com/Keats/tera/issues/435
         (
             "{{ with_newline | replace(from='\n', to='<br>') | safe }}",
             "Animal Alphabets<br>B is for Bee-Eater",
@@ -431,7 +431,7 @@ fn render_if_elif_else() {
         ("{% if is_true %}Admin{% endif %}", "Admin"),
         ("{% if is_true or age + 1 > 18 %}Adult{% endif %}", "Adult"),
         ("{% if is_true and age == 18 %}Adult{% endif %}", "Adult"),
-        // https://github.com/Keats/lysine/issues/187
+        // https://github.com/Keats/tera/issues/187
         ("{% if 1 <= 2 %}a{% endif %}", "a"),
         ("{% if 2 >= 1 %}a{% endif %}", "a"),
         ("{% if 1 < 2 %}a{% endif %}", "a"),
@@ -465,7 +465,7 @@ fn render_if_elif_else() {
         ("{% if is_true %}Admin{% elif is_false %}User{% else %}Hmm{% endif %}", "Admin"),
         ("{% if false %}Admin{% elif is_false %}User{% else %}Hmm{% endif %}", "Hmm"),
         // doesn't fallthrough elifs
-        // https://github.com/Keats/lysine/issues/188
+        // https://github.com/Keats/tera/issues/188
         ("{% if 1 < 4 %}a{% elif 2 < 4 %}b{% elif 3 < 4 %}c{% else %}d{% endif %}", "a"),
         // with in operator
         (
@@ -536,12 +536,12 @@ fn render_for() {
             "{% set looped = 0 %}{% for i in range(end=5) %}{% set looped = i %}{{looped}}{% endfor%}{{looped}}",
             "012340"
         ),
-        // https://github.com/Keats/lysine/issues/184
+        // https://github.com/Keats/tera/issues/184
         ("{% for note in notes %}{{ note }}{% endfor %}", "123"),
         ("{% for note in notes | reverse %}{{ note }}{% endfor %}", "321"),
         ("{% for v in vectors %}{{ v.0 }}{% endfor %}", "01"),
         // Loop control (`break` and `continue`)
-        // https://github.com/Keats/lysine/issues/267
+        // https://github.com/Keats/tera/issues/267
         (
             "{% for i in data %}{{ i }}{% if i == 2 %}{% break %}{% endif %}{% endfor %}",
             "12"
@@ -562,12 +562,12 @@ fn render_for() {
             "{% for a in [1, true, 1.1, 'hello'] %}{{a}}{% endfor %}",
             "1true1.1hello"
         ),
-        // https://github.com/Keats/lysine/issues/301
+        // https://github.com/Keats/tera/issues/301
         (
             "{% set start = 0 %}{% set end = start + 3 %}{% for i in range(start=start, end=end) %}{{ i }}{% endfor%}",
             "012"
         ),
-        // https://github.com/Keats/lysine/issues/395
+        // https://github.com/Keats/tera/issues/395
         (
             "{% for a in [] %}{{a}}{% else %}hello{% endfor %}",
             "hello"
@@ -604,7 +604,7 @@ fn render_magic_variable_isnt_escaped() {
     );
 }
 
-// https://github.com/Keats/lysine/issues/185
+// https://github.com/Keats/tera/issues/185
 #[test]
 fn ok_many_variable_blocks() {
     let mut context = Context::new();
@@ -842,7 +842,7 @@ fn render_magic_variable_macro_doesnt_leak() {
     );
 }
 
-// https://github.com/Keats/lysine/issues/342
+// https://github.com/Keats/tera/issues/342
 #[test]
 fn redefining_loop_value_doesnt_break_loop() {
     let mut lysine = Lysine::default();
@@ -928,7 +928,7 @@ fn stateful_global_fn() {
     );
 }
 
-// https://github.com/Keats/lysine/issues/373
+// https://github.com/Keats/tera/issues/373
 #[test]
 fn split_on_context_value() {
     let mut lysine = Lysine::default();
@@ -939,7 +939,7 @@ fn split_on_context_value() {
     assert_eq!(res.unwrap(), "[multi, ple, lines]");
 }
 
-// https://github.com/Keats/lysine/issues/422
+// https://github.com/Keats/tera/issues/422
 #[test]
 fn default_filter_works_in_condition() {
     let mut lysine = Lysine::default();

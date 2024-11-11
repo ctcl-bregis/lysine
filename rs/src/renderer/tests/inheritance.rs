@@ -143,7 +143,7 @@ fn render_super_in_top_block_errors() {
     assert!(result.is_err());
 }
 
-// https://github.com/Keats/lysine/issues/215
+// https://github.com/Keats/tera/issues/215
 #[test]
 fn render_super_in_grandchild_without_redefining_works() {
     let mut lysine = Lysine::default();

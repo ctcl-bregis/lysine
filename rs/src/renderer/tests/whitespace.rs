@@ -98,7 +98,7 @@ fn can_remove_whitespace_inheritance() {
     }
 }
 
-// https://github.com/Keats/lysine/issues/475
+// https://github.com/Keats/tera/issues/475
 #[test]
 fn works_with_filter_section() {
     let mut context = Context::new();

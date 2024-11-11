@@ -212,7 +212,7 @@ mod tests {
     use super::ForLoop;
 
     #[test]
-    fn test_that_ilysineting_on_string_yields_grapheme_clusters() {
+    fn test_that_iterating_on_string_yields_grapheme_clusters() {
         let text = "a\u{310}e\u{301}o\u{308}\u{332}".to_string();
         let string = Value::String(text.clone());
         let mut string_loop = ForLoop::from_string("whatever", Cow::Borrowed(&string));

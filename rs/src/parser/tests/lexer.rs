@@ -658,7 +658,7 @@ fn lex_extends_with_imports() {
     assert_lex_rule!(Rule::template, sample);
 }
 
-// https://github.com/Keats/lysine/issues/379
+// https://github.com/Keats/tera/issues/379
 #[test]
 fn lex_requires_whitespace_between_things() {
     // All the ones below should fail parsing

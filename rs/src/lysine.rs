@@ -178,14 +178,14 @@ impl Lysine {
 
         // Need to canonicalize the glob path because globwalk always returns
         // an empty list for paths starting with `./` or `../`.
-        // See https://github.com/Keats/lysine/issues/574 for the Lysine discussion
+        // See https://github.com/Keats/tera/issues/574 for the Lysine discussion
         // and https://github.com/Gilnaa/globwalk/issues/28 for the upstream issue.
         let (parent_dir, glob_end) = glob.split_at(glob.find('*').unwrap());
         let parent_dir = match std::fs::canonicalize(parent_dir) {
             Ok(d) => d,
             // If canonicalize fails, just abort it and resume with the given path.
             // Consumers expect invalid globs to just return the empty set instead of failing.
-            // See https://github.com/Keats/lysine/issues/819#issuecomment-1480392230
+            // See https://github.com/Keats/tera/issues/819#issuecomment-1480392230
             Err(_) => std::path::PathBuf::from(parent_dir),
         };
         let dir = parent_dir.join(glob_end).into_os_string().into_string().unwrap();
@@ -1249,7 +1249,7 @@ mod tests {
         lysine.build_inheritance_chains().unwrap();
     }
 
-    // https://github.com/Keats/lysine/issues/380
+    // https://github.com/Keats/tera/issues/380
     #[test]
     fn glob_work_with_absolute_paths() {
         let tmp_dir = tempdir().expect("create temp dir");
@@ -1272,7 +1272,7 @@ mod tests {
         assert_eq!(lysine.templates.len(), 2);
     }
 
-    // Test for https://github.com/Keats/lysine/issues/574
+    // Test for https://github.com/Keats/tera/issues/574
     #[test]
     fn glob_work_with_paths_starting_with_dots() {
         use std::path::PathBuf;
@@ -1302,7 +1302,7 @@ mod tests {
         assert_eq!(lysine.templates.len(), 2);
     }
 
-    // https://github.com/Keats/lysine/issues/396
+    // https://github.com/Keats/tera/issues/396
     #[test]
     fn issues_found_fuzzing_expressions_are_fixed() {
         let samples: Vec<(&str, Option<&str>)> = vec![
@@ -1354,7 +1354,7 @@ mod tests {
         }
     }
 
-    // https://github.com/Keats/lysine/issues/819
+    // https://github.com/Keats/tera/issues/819
     #[test]
     fn empty_list_on_invalid_glob() {
         let lysine = Lysine::new("\\dev/null/*");

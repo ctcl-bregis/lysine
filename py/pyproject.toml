@@ -1,9 +1,6 @@
 [project]
-name = "lysine_ctcl"
-version = "0.0.1"
-authors = [
-  { name="CTCL" },
-]
+name = "lysine"
+version = "0.1.0"
 description = "Lysine pre-processor language"
 readme = "README.md"
 requires-python = ">=3.8"

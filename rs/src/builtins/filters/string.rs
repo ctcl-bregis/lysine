@@ -592,7 +592,7 @@ mod tests {
         assert_eq!(result.unwrap(), to_value("Goodbye world!").unwrap());
     }
 
-    // https://github.com/Keats/lysine/issues/435
+    // https://github.com/Keats/tera/issues/435
     #[test]
     fn test_replace_newline() {
         let mut args = HashMap::new();

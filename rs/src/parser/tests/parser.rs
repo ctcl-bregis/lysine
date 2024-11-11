@@ -760,7 +760,7 @@ fn parse_raw_tag() {
     assert_eq!(ast[0], Node::Raw(start_ws, "{{hey}}".to_string(), end_ws));
 }
 
-// https://github.com/Keats/lysine/issues/513
+// https://github.com/Keats/tera/issues/513
 #[test]
 fn parse_raw_tag_with_ws() {
     // println!("{}", parse("{% raw %}    yaml_test:     {% endraw %}").unwrap_err());

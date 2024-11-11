@@ -59,7 +59,7 @@ fn var_access_by_square_brackets_errors() {
     assert!(t.is_err(), "Access of csd should be impossible");
 }
 
-// https://github.com/Keats/lysine/issues/334
+// https://github.com/Keats/tera/issues/334
 #[test]
 fn var_access_by_loop_index() {
     let context = Context::new();
@@ -76,7 +76,7 @@ fn var_access_by_loop_index() {
     assert!(res.is_ok());
 }
 
-// https://github.com/Keats/lysine/issues/334
+// https://github.com/Keats/tera/issues/334
 #[test]
 fn var_access_by_loop_index_with_set() {
     let context = Context::new();
@@ -94,7 +94,7 @@ fn var_access_by_loop_index_with_set() {
     assert!(res.is_ok());
 }
 
-// https://github.com/Keats/lysine/issues/754
+// https://github.com/Keats/tera/issues/754
 #[test]
 fn can_get_value_if_key_contains_period() {
     let mut context = Context::new();

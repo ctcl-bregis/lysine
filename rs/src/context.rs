@@ -225,7 +225,7 @@ impl ValueTruthy for Value {
 pub fn get_json_pointer(key: &str) -> String {
     lazy_static::lazy_static! {
         // Split the key into dot-separated segments, respecting quoted strings as single units
-        // to fix https://github.com/Keats/lysine/issues/590
+        // to fix https://github.com/Keats/tera/issues/590
         static ref JSON_POINTER_REGEX: regex::Regex = regex::Regex::new(r#""[^"]*"|[^.]+"#).unwrap();
     }
     let mut res = String::with_capacity(key.len() + 1);

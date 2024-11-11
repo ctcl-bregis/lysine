@@ -281,7 +281,7 @@ pub struct Block {
 // A forloop: can be over values or key/values
 #[derive(Clone, Debug, PartialEq)]
 pub struct Forloop {
-    // Name of the key in the loop (only when ilysineting on map-like objects)
+    // Name of the key in the loop (only when iterating on map-like objects)
     pub key: Option<String>,
     // Name of the local variable for the value in the loop
     pub value: String,

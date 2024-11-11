@@ -167,7 +167,7 @@ fn render_recursive_macro() {
     assert_eq!(result.unwrap(), "7 - 6 - 5 - 4 - 3 - 2 - 11234567".to_string());
 }
 
-// https://github.com/Keats/lysine/issues/202
+// https://github.com/Keats/tera/issues/202
 #[test]
 fn recursive_macro_with_loops() {
     let parent = NestedObject { label: "Parent".to_string(), parent: None, numbers: vec![1, 2, 3] };
@@ -210,7 +210,7 @@ fn recursive_macro_with_loops() {
     assert_eq!(result.unwrap(), "Parent123|Child123".to_string());
 }
 
-// https://github.com/Keats/lysine/issues/250
+// https://github.com/Keats/tera/issues/250
 #[test]
 fn render_macros_in_included() {
     let mut lysine = Lysine::default();
@@ -225,7 +225,7 @@ fn render_macros_in_included() {
     assert_eq!(result.unwrap(), "my macro".to_string());
 }
 
-// https://github.com/Keats/lysine/issues/255
+// https://github.com/Keats/tera/issues/255
 #[test]
 fn import_macros_into_other_macro_files() {
     let mut lysine = Lysine::default();
@@ -271,7 +271,7 @@ fn can_load_macro_in_child() {
     assert_eq!(result.unwrap(), "1".to_string());
 }
 
-// https://github.com/Keats/lysine/issues/333
+// https://github.com/Keats/tera/issues/333
 // this test fails in 0.11.14, worked in 0.11.10
 #[test]
 fn can_inherit_macro_import_from_parent() {

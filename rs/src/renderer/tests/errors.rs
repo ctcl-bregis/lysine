@@ -177,7 +177,7 @@ fn error_when_using_variable_set_in_included_templates_outside() {
     );
 }
 
-// https://github.com/Keats/lysine/issues/344
+// https://github.com/Keats/tera/issues/344
 // Yes it is as silly as it sounds
 #[test]
 fn right_variable_name_is_needed_in_for_loop() {
@@ -204,8 +204,8 @@ fn right_variable_name_is_needed_in_for_loop() {
     );
 }
 
-// https://github.com/Keats/lysine/issues/385
-// https://github.com/Keats/lysine/issues/370
+// https://github.com/Keats/tera/issues/385
+// https://github.com/Keats/tera/issues/370
 #[test]
 fn errors_with_inheritance_in_included_template() {
     let mut lysine = Lysine::default();
