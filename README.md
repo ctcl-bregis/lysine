@@ -1,7 +1,7 @@
-<img src="lysine_20241109.svg" style="width: 25%;" alt="Lysine"/>
+<img src="media/lysine.svg" style="width: 25%;" alt="Lysine"/>
 
 # Lysine
-Lysine is a preprocessor/templating scripting language for webpages.
+Lysine is a templating language intended for use with webpages.
 
 This repository currently contains compilier implementations for the following:
 * Rust

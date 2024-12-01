@@ -2,5 +2,6 @@
     "psi-header.variables": [
         ["projectname", "Lysine"],
         ["projectCreationYear", "2024"]
-    ]
+    ],
+    "svg.preview.background": "editor"
 }
