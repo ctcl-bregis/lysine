@@ -495,7 +495,7 @@ class InternationalizationExtension(Extension):
                     )
                 elif block_name == "trans":
                     parser.fail(
-                        "trans blocks can't be nested; did you mean `endtrans`?"
+                        "trans blocks can't be nested"
                     )
                 parser.fail(
                     f"control structures in translatable sections are not allowed; "

@@ -368,7 +368,7 @@ def do_dictsort(
     elif by == "value":
         pos = 1
     else:
-        raise FilterArgumentError('You can only sort by either "key" or "value"')
+        raise FilterArgumentError('Dicts can only be sorted by "key" or "value"')
 
     def sort_func(item: t.Tuple[t.Any, t.Any]) -> t.Any:
         value = item[pos]
@@ -663,8 +663,7 @@ def do_last(
 ) -> "t.Union[V, Undefined]":
     """Return the last item of a sequence.
 
-    Note: Does not work with generators. You may want to explicitly
-    convert it to a list:
+    Note: Does not work with generators.
 
     .. sourcecode:: jinja
 

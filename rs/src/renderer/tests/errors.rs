@@ -44,7 +44,7 @@ fn error_loading_macro_from_unloaded_namespace() {
     println!("{:#?}", result);
     assert_eq!(
         result.unwrap_err().source().unwrap().to_string(),
-        "Macro namespace `macro` was not found in template `tpl`. Have you maybe forgotten to import it, or misspelled it?"
+        "Macro namespace `macro` was not found in template `tpl`."
     );
 }
 

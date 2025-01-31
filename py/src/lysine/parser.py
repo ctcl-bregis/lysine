@@ -111,7 +111,7 @@ class Parser:
         if currently_looking:
             if name is not None and name in expected:
                 message.append(
-                    "You probably made a nesting mistake. Jinja is expecting this tag,"
+                    "This tag expected,"
                     f" but currently looking for {currently_looking}."
                 )
             else:
@@ -972,7 +972,7 @@ class Parser:
             "lbrace",
         } and not self.stream.current.test_any("name:else", "name:or", "name:and"):
             if self.stream.current.test("name:is"):
-                self.fail("You cannot chain multiple tests with is")
+                self.fail("Multiple tests cannot be chained with is")
             arg_node = self.parse_primary()
             arg_node = self.parse_postfix(arg_node)
             args = [arg_node]

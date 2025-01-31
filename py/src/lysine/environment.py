@@ -520,7 +520,7 @@ class Environment:
                 try:
                     name._fail_with_undefined_error()
                 except Exception as e:
-                    msg = f"{msg} ({e}; did you forget to quote the callable name?)"
+                    msg = f"{msg} ({e})"
 
             raise TemplateRuntimeError(msg)
 
@@ -1530,7 +1530,7 @@ class TemplateModule:
                 raise RuntimeError(
                     "Async mode requires a body stream to be passed to"
                     " a template module. Use the async methods of the"
-                    " API you are using."
+                    " API used."
                 )
 
             body_stream = list(template.root_render_func(context))

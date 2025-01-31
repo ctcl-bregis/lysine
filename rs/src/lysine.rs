@@ -836,7 +836,7 @@ impl Lysine {
         if self.glob.is_some() {
             self.load_from_glob()?;
         } else {
-            return Err(Error::msg("Reloading is only available if you are using a glob"));
+            return Err(Error::msg("Reloading is only available if a glob is used"));
         }
 
         self.build_inheritance_chains()?;

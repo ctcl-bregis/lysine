@@ -49,7 +49,7 @@ fn replace_string_markers(input: &str) -> String {
         '"' => input.replace('"', ""),
         '\'' => input.replace('\'', ""),
         '`' => input.replace('`', ""),
-        _ => unreachable!("How did you even get there"),
+        _ => unreachable!("Unreached in replace_string_markers"),
     }
 }
 
